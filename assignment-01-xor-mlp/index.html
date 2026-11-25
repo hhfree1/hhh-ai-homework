@@ -111,9 +111,9 @@ CPU AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD
 cd hhh-ai-homework/assignment-01-xor-mlp
 pip install torch numpy matplotlib
 python code/run_and_log.py   # 训练并写出 data/metrics.json（含逐轮帧）
+python code/random_init.py   # 随机初值重复 20 次 → data/random_init.json
 python code/make_figures.py  # 由 json 生成五张静态图
-python code/build_page.py    # 由 json 重新生成本页
-python code/random_init.py   # 随机初值重复 20 次</pre>
+python code/build_page.py    # 最后由全部 json 生成本页</pre>
   <p class="muted">超参固定为课程第 66 页给出的那一组：2-2-1、四个样本整批、二元交叉熵、Adam、学习率 0.03、300 轮、float64、阈值 0.5。</p>
 </section>
 
