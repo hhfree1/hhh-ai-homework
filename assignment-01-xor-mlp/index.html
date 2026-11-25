@@ -55,6 +55,13 @@
     background:#E6F1FB; color:var(--blue);
   }
   .chip.bad { background:#FCEBEB; color:var(--bad); }
+  .live { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; align-items:start; }
+  .panel { border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:#fff; min-width:0; }
+  .panel h3 { font-size:13px; font-weight:600; color:var(--muted); margin:0 0 10px; }
+  .eq { font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; line-height:1.85; white-space:pre; overflow-x:auto; margin:0; color:var(--ink); background:#FBFAF7; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .eq span { color:var(--blue); }
+  .hint { font-size:12px; color:var(--muted); margin:8px 0 0; }
+  @media (max-width:640px) { .live { grid-template-columns:1fr; } }
   ol { padding-left:20px; } ol li { margin-bottom:8px; }
   a { color:var(--blue); }
   footer { border-top:1px solid var(--line); margin-top:34px; padding-top:16px; font-size:12.5px; color:var(--muted); }
@@ -101,7 +108,7 @@ CPU AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD
 cd hhh-ai-homework/assignment-01-xor-mlp
 pip install torch numpy matplotlib
 python code/run_and_log.py   # 训练并写出 data/metrics.json（含逐轮帧）
-python code/make_figures.py  # 由 json 生成四张静态图
+python code/make_figures.py  # 由 json 生成五张静态图
 python code/build_page.py    # 由 json 重新生成本页
 python code/random_init.py   # 随机初值重复 20 次</pre>
   <p class="muted">超参固定为课程第 66 页给出的那一组：2-2-1、四个样本整批、二元交叉熵、Adam、学习率 0.03、300 轮、float64、阈值 0.5。</p>
@@ -126,7 +133,40 @@ python code/random_init.py   # 随机初值重复 20 次</pre>
     <input id="demo-range" type="range" min="0" max="300" value="0" step="1" style="flex:1 1 150px">
     <span id="demo-readout" style="font-size:13px;color:#2C2C2A;font-variant-numeric:tabular-nums"></span>
   </div>
-  <p class="cap">看两件事：训练开始后判定区域从「几乎全判 0」逐渐长出两块对角区域；同时右边的四个点从聚在一处变成「00 与 11 重合于原点、01 与 10 各占一角」。参数是逐轮记录的，不是补间动画。</p>
+  <div class="live">
+    <div class="panel">
+      <h3>当前网络：线宽 = |权重|，橙为正、蓝为负</h3>
+      <svg viewBox="0 0 320 210" role="img" aria-label="2-2-1 网络结构图，连线粗细与颜色对应当前权重，节点亮度对应当前输出" style="width:100%;height:auto;max-height:240px">
+        <g stroke-linecap="round">
+          <line id="l00" x1="44" y1="62" x2="164" y2="62" stroke="#BA7517" stroke-width="3"></line>
+          <line id="l01" x1="44" y1="62" x2="164" y2="148" stroke="#BA7517" stroke-width="3"></line>
+          <line id="l10" x1="44" y1="148" x2="164" y2="62" stroke="#BA7517" stroke-width="3"></line>
+          <line id="l11" x1="44" y1="148" x2="164" y2="148" stroke="#BA7517" stroke-width="3"></line>
+          <line id="lv0" x1="164" y1="62" x2="282" y2="105" stroke="#BA7517" stroke-width="3"></line>
+          <line id="lv1" x1="164" y1="148" x2="282" y2="105" stroke="#BA7517" stroke-width="3"></line>
+        </g>
+        <g font-family="system-ui,sans-serif" font-size="11" text-anchor="middle">
+          <circle id="n-i1" cx="44" cy="62" r="17" fill="#185FA5" stroke="#185FA5" stroke-width="2"></circle>
+          <circle id="n-i2" cx="44" cy="148" r="17" fill="#185FA5" stroke="#185FA5" stroke-width="2"></circle>
+          <circle id="n-h1" cx="164" cy="62" r="17" fill="#BA7517" stroke="#BA7517" stroke-width="2"></circle>
+          <circle id="n-h2" cx="164" cy="148" r="17" fill="#BA7517" stroke="#BA7517" stroke-width="2"></circle>
+          <circle id="n-o" cx="282" cy="105" r="17" fill="#0F6E56" stroke="#0F6E56" stroke-width="2"></circle>
+          <text x="44" y="34" fill="#2C2C2A">x1</text>
+          <text x="44" y="186" fill="#2C2C2A">x2</text>
+          <text x="164" y="34" fill="#2C2C2A">h1</text>
+          <text x="164" y="186" fill="#2C2C2A">h2</text>
+          <text x="282" y="77" fill="#2C2C2A">y</text>
+        </g>
+      </svg>
+      <p class="hint">节点亮度 = 该单元当前的输出；图对应第 <span id="net-epoch">0</span> 轮。六个权重是同一条权重向量在页面上的另一种读法。</p>
+    </div>
+    <div class="panel">
+      <h3>样本 01 走一遍（正确答案 1）</h3>
+      <pre class="eq" id="chain">加载中</pre>
+      <p class="hint">都是当前这一轮的参数代入后的数值，与上面的进度条同步。式中权重保留两位、结果保留四位，四舍五入后末位可能差一点。</p>
+    </div>
+  </div>
+  <p class="cap">看两件事：左边判定区域从「几乎全判 0」（第 0 轮四样本概率 0.29 / 0.46 / 0.46 / 0.29）逐渐长出两块对角区域；右边四个点也在动——第 0 轮 00 与 11 同在 (0.269, 0.269)，01 在 (0.047, 0.731)、10 在 (0.731, 0.047)，第 300 轮 01、10 被推到 (0.0001, 0.935) 与 (0.935, 0.0001)。参数是逐轮记录的，不是补间动画。</p>
 </section>
 
 <section class="card">
@@ -138,23 +178,34 @@ python code/random_init.py   # 随机初值重复 20 次</pre>
 </section>
 
 <section class="card">
-  <h2>③ 隐藏层两个单元在学什么</h2>
+  <h2>③ 九个参数各自的轨迹</h2>
+  <figure>
+    <img src="figures/param_trajectories.png" alt="九个参数随训练轮数变化的曲线">
+    <figcaption>这张图说明：动的不只是输出，九个参数本身一直在变，而且方向持续一致——W 的两个对角项升到约 ±6.1、
+    两个隐藏偏置降到 -3.47、输出权重升到 8.19。三个子图里能看见的曲线少于参数个数，原因在初值：
+    W 起于 <code>[[2,-2],[-2,2]]</code>、两个偏置同为 -1，四个样本又成对对称，于是 W00 与 W11、W01 与 W10、
+    b0 与 b1、v0 与 v1 全程重合。这是这次运行的真实情况，不是画漏。</figcaption>
+  </figure>
+</section>
+
+<section class="card">
+  <h2>④ 隐藏层两个单元在学什么</h2>
   <figure>
     <img src="figures/hidden_activations.png" alt="训练前后四个样本在两个隐藏单元上的输出">
-    <figcaption>这张图说明：训练前两个单元对四个样本反应都很软；训练后 h₁ 只在 10 上接近 1、h₂ 只在 01 上接近 1——它们自己分化成了两个「检测器」，没人告诉它们该这样。</figcaption>
+    <figcaption>第 0 轮两个单元已经有方向（01 在 h₂ 上 0.731、10 在 h₁ 上 0.731），但同类的 00 与 11 也有 0.269，余量不足；第 300 轮 h₁ 在 10 上 0.935、在 01 上 0.0001，h₂ 正好相反，00 与 11 降到 0.03 附近。从「有倾向」变成「接近二值」，这一步是梯度推出来的，初值只给了方向。</figcaption>
   </figure>
 </section>
 
 <section class="card">
-  <h2>④ 四个点被搬到了哪里</h2>
+  <h2>⑤ 四个点被搬到了哪里</h2>
   <figure>
     <img src="figures/hidden_space.png" alt="四个样本在隐藏层坐标中的位置，训练前后">
-    <figcaption>这张图说明：隐藏层做的是换坐标。00 和 11 被搬到同一个位置（因为它们同类），01 和 10 被甩到两个角上，于是原本「一条直线切不开」的问题，在新坐标里变成「一条直线就能切开」。</figcaption>
+    <figcaption>两幅图的坐标都是 (h₁, h₂)。第 0 轮：00 与 11 精确落在同一点 (0.269, 0.269)，01 在 (0.047, 0.731)、10 在 (0.731, 0.047)，此时输出层分界线 3h₁+3h₂−2.5=0 仍把 01、10 判成 0（概率 0.459）。第 300 轮：00/11 移到原点附近（0.030 与 0.034），01、10 分别被推到 (0.0001, 0.935) 与 (0.935, 0.0001)，分界线从中间穿过，四个点才真正被分开。</figcaption>
   </figure>
 </section>
 
 <section class="card">
-  <h2>⑤ 最终概率与判定</h2>
+  <h2>⑥ 最终概率与判定</h2>
   <figure>
     <img src="figures/probability_bars.png" alt="四个样本的最终输出概率与 0.5 阈值">
     <figcaption>这张图说明：两类样本的概率分别落在 0.5 两侧很远的位置（约 0.029 与 0.975），不是勉强压线，这是收敛的表征。</figcaption>
@@ -179,7 +230,7 @@ python code/random_init.py   # 随机初值重复 20 次</pre>
   <h2>三点解读</h2>
   <ol>
     <li><strong>为什么单层不行。</strong>单层感知器只有一次判断，在平面上表现为一条直线。XOR 的两类点在对角交错，任何一条直线切下去，两边都会同时出现 0 和 1。</li>
-    <li><strong>隐藏层做了什么。</strong>它先把四个点搬到新坐标（h₁, h₂），让同类点重合、异类点分开；输出层再在这个新坐标里画一条线。分工是「隐藏层摆点，输出层画线」。</li>
+    <li><strong>隐藏层做了什么。</strong>它把四个点搬到新坐标（h₁, h₂）：同类点落在同一点附近，异类点被推向对角；输出层再在这个新坐标里画一条线。这次运行里 00 与 11 从第 0 轮就重合（初值对称），训练做的是把异类点的间距从 0.73 / 0.27 拉到 0.935 / 0.0001。分工仍是「隐藏层摆点，输出层画线」。</li>
     <li><strong>为什么能自动做到。</strong>不用人手写 h₁/h₂ 的规则：损失函数量出「差多少」，梯度指出「往哪改」，优化器每轮改一点点，300 轮后规则自己长出来。</li>
   </ol>
 </section>

@@ -1,4 +1,4 @@
-"""从 data/metrics.json 生成四张图，输出到 figures/。
+"""从 data/metrics.json 生成五张图，输出到 figures/。
 
 所有图形都由实测数据绘制，不含任何示意性内容。
 """
@@ -14,6 +14,7 @@ from matplotlib import font_manager
 
 C0 = "#185FA5"
 C1 = "#BA7517"
+C2 = "#0F6E56"
 GRID = "#D3D1C7"
 TEXT = "#2C2C2A"
 MUTED = "#5F5E5A"
@@ -104,7 +105,7 @@ finish(fig, "figures/hidden_activations.png")
 
 fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.6))
 for ax, snap, title in zip(
-    axes, [before, after], ["训练前：两点几乎重合", "训练后：两点完全重合"]
+    axes, [before, after], ["第 0 轮：同类点已在同一点", "第 300 轮：异类点被推到对角"]
 ):
     groups = {}
     for (h1, h2), name, y in zip(snap["hidden"], names, labels):
@@ -158,3 +159,32 @@ ax.set_axisbelow(True)
 for side in ("top", "right"):
     ax.spines[side].set_visible(False)
 finish(fig, "figures/probability_bars.png")
+
+# 九个参数各自的轨迹：数据来自 frames（每一轮一条），不是每 10 轮的抽样
+frames = m["frames"]
+fx = [fr["e"] for fr in frames]
+cols = list(zip(*[fr["p"] for fr in frames]))
+
+fig, axes = plt.subplots(3, 1, figsize=(6.6, 7.4), sharex=True)
+groups = [
+    (axes[0], [0, 1, 2, 3], ["W00", "W01", "W10", "W11"], [C0, C0, C1, C1], ["-", "--", "-", "--"],
+     "输入到隐藏层的四个权重 W"),
+    (axes[1], [4, 5], ["b0", "b1"], [C0, C1], ["-", "-"], "隐藏层的两个偏置 b"),
+    (axes[2], [6, 7, 8], ["v0", "v1", "b_out"], [C0, C1, C2], ["-", "-", "--"],
+     "隐藏到输出层的权重 v 与输出偏置"),
+]
+for ax, idxs, labs, cols_c, styles, title in groups:
+    for i, lab, c, st in zip(idxs, labs, cols_c, styles):
+        ax.plot(fx, cols[i], color=c, linewidth=1.6, linestyle=st,
+                label=f"{lab} → {cols[i][-1]:+.2f}")
+    ax.set_title(title, fontsize=10, color=TEXT, loc="left")
+    ax.grid(axis="y", color=GRID, linewidth=0.6, alpha=0.7)
+    ax.set_axisbelow(True)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.legend(frameon=False, fontsize=8.5, ncol=2, loc="best")
+axes[0].set_ylabel("参数值")
+axes[1].set_ylabel("参数值")
+axes[2].set_ylabel("参数值")
+axes[2].set_xlabel("训练轮数 epoch")
+finish(fig, "figures/param_trajectories.png")

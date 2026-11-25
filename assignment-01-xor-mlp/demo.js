@@ -15,6 +15,10 @@
   const MUTED = "#5F5E5A";
   const SIZE = 640;
   const PAD = 70;
+  /* 坐标框表示 [-0.07, 1.07]：样本点落在 0/1 上，留一点余量才不会压住边框和刻度 */
+  const D0 = -0.07;
+  const D1 = 1.07;
+  const SPAN = SIZE - PAD * 2;
 
   const cvIn = document.getElementById("c-input");
   const cvHi = document.getElementById("c-hidden");
@@ -51,10 +55,10 @@
   }
 
   function px(v) {
-    return PAD + v * (SIZE - PAD * 2);
+    return PAD + ((v - D0) / (D1 - D0)) * SPAN;
   }
   function py(v) {
-    return SIZE - PAD - v * (SIZE - PAD * 2);
+    return SIZE - PAD - ((v - D0) / (D1 - D0)) * SPAN;
   }
 
   function axes(ctx, title) {
@@ -63,7 +67,7 @@
     ctx.fillRect(0, 0, SIZE, SIZE);
     ctx.strokeStyle = "#E3E1DA";
     ctx.lineWidth = 1;
-    ctx.strokeRect(PAD, PAD, SIZE - PAD * 2, SIZE - PAD * 2);
+    ctx.strokeRect(PAD, PAD, SPAN, SPAN);
     ctx.fillStyle = MUTED;
     ctx.font = "19px system-ui, sans-serif";
     ctx.textAlign = "center";
@@ -82,8 +86,8 @@
     const d = img.data;
     for (let j = 0; j < N; j++) {
       for (let i = 0; i < N; i++) {
-        const x1 = i / (N - 1);
-        const x2 = 1 - j / (N - 1);
+        const x1 = D0 + (i / (N - 1)) * (D1 - D0);
+        const x2 = D1 - (j / (N - 1)) * (D1 - D0);
         const p = forward(x1, x2, q).p;
         const a = 0.12 + Math.min(1, Math.abs(2 * p - 1)) * 0.55;
         const base = p >= 0.5 ? [186, 117, 23] : [24, 95, 165];
@@ -96,7 +100,7 @@
     }
     offCtx.putImageData(img, 0, 0);
     ctxIn.imageSmoothingEnabled = true;
-    ctxIn.drawImage(off, PAD, PAD, SIZE - PAD * 2, SIZE - PAD * 2);
+    ctxIn.drawImage(off, PAD, PAD, SPAN, SPAN);
   }
 
   function drawGrouped(ctx, pts) {
@@ -118,14 +122,73 @@
       ctx.stroke();
       ctx.fillStyle = g.y0 === 0 ? C0 : C1;
       ctx.font = "21px system-ui, sans-serif";
+      /* 靠近右边或上边的点，标签改到另一侧，避免被框或刻度挡住 */
+      let dx = 14;
+      let dy = -14;
+      let align = "left";
+      if (g.x > 0.82) {
+        dx = -14;
+        align = "right";
+      }
+      if (g.y > 0.82) dy = 26;
+      ctx.textAlign = align;
+      ctx.fillText(g.names.join("/"), px(g.x) + dx, py(g.y) + dy);
       ctx.textAlign = "left";
-      ctx.fillText(g.names.join("/"), px(g.x) + 14, py(g.y) - 14);
     });
+  }
+
+  const edgeIds = ["l00", "l01", "l10", "l11", "lv0", "lv1"];
+
+  function setOpacity(id, v) {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute("fill-opacity", (0.18 + 0.82 * v).toFixed(3));
+  }
+
+  /* 结构图的线宽/颜色 + 样本 01 的逐节点算式，两者都跟着当前帧走 */
+  function updatePanels(q, epoch) {
+    const ws = [q.W00, q.W01, q.W10, q.W11, q.v0, q.v1];
+    const maxAbs = Math.max(1e-6, ...ws.map(Math.abs));
+    ws.forEach((w, i) => {
+      const el = document.getElementById(edgeIds[i]);
+      if (!el) return;
+      const rel = Math.abs(w) / maxAbs;
+      el.setAttribute("stroke", w >= 0 ? "#BA7517" : "#185FA5");
+      el.setAttribute("stroke-width", (1.2 + 7.8 * rel).toFixed(2));
+      el.setAttribute("stroke-opacity", (0.2 + 0.8 * rel).toFixed(2));
+    });
+
+    const r = forward(0, 1, q);
+    setOpacity("n-i1", 1);
+    setOpacity("n-i2", 1);
+    setOpacity("n-h1", r.h1);
+    setOpacity("n-h2", r.h2);
+    setOpacity("n-o", r.p);
+    const ep = document.getElementById("net-epoch");
+    if (ep) ep.textContent = epoch;
+
+    const z = q.v0 * r.h1 + q.v1 * r.h2 + q.bo;
+    const term = (w, x, first) => {
+      const sign = w < 0 ? " - " : (first ? " " : " + ");
+      return sign + Math.abs(w).toFixed(2) + "×" + x;
+    };
+    const bias = (b) => (b < 0 ? " - " : " + ") + Math.abs(b).toFixed(2);
+    const lines = [
+      "h1 = sigmoid(" + term(q.W00, 0, true) + term(q.W10, 1, false) + bias(q.b0) + " )",
+      "     = " + r.h1.toFixed(4),
+      "h2 = sigmoid(" + term(q.W01, 0, true) + term(q.W11, 1, false) + bias(q.b1) + " )",
+      "     = " + r.h2.toFixed(4),
+      "z  =" + term(q.v0, r.h1.toFixed(4), true) + term(q.v1, r.h2.toFixed(4), false) + bias(q.bo),
+      "   = " + z.toFixed(2),
+      "p  = sigmoid(" + z.toFixed(2) + ") = " + r.p.toFixed(4) + (r.p >= 0.5 ? "  → 判 1" : "  → 判 0"),
+    ];
+    const chain = document.getElementById("chain");
+    if (chain) chain.textContent = lines.join("\n");
   }
 
   function render(idx) {
     const f = frames[idx];
     const q = params(f);
+    updatePanels(q, f.e);
 
     axes(ctxIn, "输入空间：判定区域随训练变化");
     drawField(q);
@@ -135,6 +198,10 @@
     );
 
     axes(ctxHi, "隐藏空间：四个点被搬到哪里");
+    ctxHi.save();
+    ctxHi.beginPath();
+    ctxHi.rect(PAD, PAD, SPAN, SPAN);
+    ctxHi.clip();
     if (Math.abs(q.v1) > 1e-4) {
       const h1a = -0.2;
       const h1b = 1.2;
@@ -147,6 +214,7 @@
       ctxHi.lineWidth = 2.5;
       ctxHi.stroke();
     }
+    ctxHi.restore();
     drawGrouped(
       ctxHi,
       samples.map(([a, b], i) => {
