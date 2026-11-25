@@ -69,7 +69,7 @@
     ctx.lineWidth = 1;
     ctx.strokeRect(PAD, PAD, SPAN, SPAN);
     ctx.fillStyle = MUTED;
-    ctx.font = "19px system-ui, sans-serif";
+    ctx.font = "26px system-ui, sans-serif";
     ctx.textAlign = "center";
     for (let k = 0; k <= 1; k += 0.5) {
       ctx.fillText(k.toFixed(1), px(k), SIZE - PAD + 28);
@@ -78,7 +78,7 @@
       ctx.textAlign = "center";
     }
     ctx.fillStyle = INK;
-    ctx.font = "22px system-ui, sans-serif";
+    ctx.font = "30px system-ui, sans-serif";
     ctx.fillText(title, SIZE / 2, 34);
   }
 
@@ -114,23 +114,23 @@
     });
     groups.forEach((g) => {
       ctx.beginPath();
-      ctx.arc(px(g.x), py(g.y), 11, 0, Math.PI * 2);
+      ctx.arc(px(g.x), py(g.y), 13, 0, Math.PI * 2);
       ctx.fillStyle = g.y0 === 0 ? C0 : C1;
       ctx.fill();
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = 3;
       ctx.stroke();
       ctx.fillStyle = g.y0 === 0 ? C0 : C1;
-      ctx.font = "21px system-ui, sans-serif";
+      ctx.font = "27px system-ui, sans-serif";
       /* 靠近右边或上边的点，标签改到另一侧，避免被框或刻度挡住 */
-      let dx = 14;
-      let dy = -14;
+      let dx = 16;
+      let dy = -18;
       let align = "left";
       if (g.x > 0.82) {
-        dx = -14;
+        dx = -16;
         align = "right";
       }
-      if (g.y > 0.82) dy = 26;
+      if (g.y > 0.82) dy = 32;
       ctx.textAlign = align;
       ctx.fillText(g.names.join("/"), px(g.x) + dx, py(g.y) + dy);
       ctx.textAlign = "left";
@@ -233,9 +233,12 @@
   }
 
   let cur = 0;
-  let playing = true;
+  /* 系统设置了"减少动态效果"时，先停在第一帧，由用户点播放 */
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let playing = !reducedMotion;
   let last = 0;
   const MS_PER_FRAME = 26;
+  if (!playing) playBtn.textContent = "播放";
 
   const jump = new URLSearchParams(location.search).get("frame");
   if (jump !== null && !isNaN(Number(jump))) {

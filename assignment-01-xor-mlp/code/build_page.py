@@ -124,7 +124,10 @@ html = f"""<!doctype html>
   .eq {{ font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; line-height:1.85; white-space:pre; overflow-x:auto; margin:0; color:var(--ink); background:#FBFAF7; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }}
   .eq span {{ color:var(--blue); }}
   .hint {{ font-size:12px; color:var(--muted); margin:8px 0 0; }}
-  @media (max-width:640px) {{ .live {{ grid-template-columns:1fr; }} }}
+  @media (max-width:640px) {{
+    .live {{ grid-template-columns:1fr; }}
+    .demo-ctrl {{ position:sticky; bottom:0; background:var(--bg); padding:8px 0 6px; z-index:5; border-top:1px solid var(--line); }}
+  }}
   ol {{ padding-left:20px; }} ol li {{ margin-bottom:8px; }}
   a {{ color:var(--blue); }}
   footer {{ border-top:1px solid var(--line); margin-top:34px; padding-top:16px; font-size:12.5px; color:var(--muted); }}
@@ -177,19 +180,19 @@ python code/random_init.py   # 随机初值重复 20 次</pre>
   <p>下面的动画不是示意，而是把训练过程中<strong>每一轮</strong>记录下来的参数重放一遍：左边是输入空间里判定区域的变化，右边是四个样本在隐藏空间里被搬动的位置。可以拖动进度条停在任意一轮。</p>
   <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
     <div style="flex:1 1 260px;min-width:240px">
-      <canvas id="c-input" width="640" height="640" style="width:100%;height:auto;border:1px solid #E3E1DA;border-radius:8px;background:#fff"></canvas>
+      <canvas id="c-input" width="640" height="640" role="img" aria-label="输入空间中的判定区域随训练轮数变化，四个样本为 00、01、10、11；下方滑块可切换轮数" style="width:100%;height:auto;border:1px solid #E3E1DA;border-radius:8px;background:#fff"></canvas>
       <div style="font-size:12.5px;color:#5F5E5A;margin-top:6px;text-align:center">输入空间 (x1, x2)：底色是当前判定，蓝为判 0、橙为判 1</div>
     </div>
     <div style="flex:1 1 260px;min-width:240px">
-      <canvas id="c-hidden" width="640" height="640" style="width:100%;height:auto;border:1px solid #E3E1DA;border-radius:8px;background:#fff"></canvas>
+      <canvas id="c-hidden" width="640" height="640" role="img" aria-label="四个样本映射到隐藏空间后的位置，绿色直线为输出层分界线；下方滑块可切换轮数" style="width:100%;height:auto;border:1px solid #E3E1DA;border-radius:8px;background:#fff"></canvas>
       <div style="font-size:12.5px;color:#5F5E5A;margin-top:6px;text-align:center">隐藏空间 (h1, h2)：绿线是输出层的分界线</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px">
+  <div class="demo-ctrl" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px">
     <button id="demo-play" style="font:inherit;font-size:13.5px;padding:6px 14px;border:1px solid #D3D1C7;background:#fff;border-radius:6px;cursor:pointer;color:#2C2C2A">暂停</button>
     <button id="demo-reset" style="font:inherit;font-size:13.5px;padding:6px 14px;border:1px solid #D3D1C7;background:#fff;border-radius:6px;cursor:pointer;color:#2C2C2A">重放</button>
-    <input id="demo-range" type="range" min="0" max="{last_epoch}" value="0" step="1" style="flex:1 1 150px">
-    <span id="demo-readout" style="font-size:13px;color:#2C2C2A;font-variant-numeric:tabular-nums"></span>
+    <input id="demo-range" type="range" min="0" max="{last_epoch}" value="0" step="1" aria-label="训练轮数" style="flex:1 1 150px">
+    <span id="demo-readout" role="status" aria-live="polite" style="font-size:13px;color:#2C2C2A;font-variant-numeric:tabular-nums"></span>
   </div>
   <div class="live">
     <div class="panel">
