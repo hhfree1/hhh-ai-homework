@@ -66,7 +66,7 @@ html = f"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>XOR 与 2-2-1 多层网络 · 实测记录</title>
+<title>MLP 学习参数的实现与可视化 · 2-2-1 网络学 XOR</title>
 <style>
   :root {{
     --ink:#2C2C2A; --muted:#5F5E5A; --line:#E3E1DA; --bg:#FBFAF7;
@@ -128,8 +128,8 @@ html = f"""<!doctype html>
 <div class="wrap">
 
 <header>
-  <div class="kicker">人工智能通识 · 第 66 页「多层网络怎样学习参数」</div>
-  <h1>用 2-2-1 网络学 XOR：一次可复现的实测记录</h1>
+  <div class="kicker">人工智能通识 · 第二篇 15 节「人工神经元网络」· 讲义第 66 页</div>
+  <h1>MLP 学习参数的实现与可视化：2-2-1 网络学 XOR 的实测记录</h1>
   <div class="sub">作者 hhfree1 · 运行于 {date.today().isoformat()} · 代码、数据、图表全部可下载核对</div>
 </header>
 
@@ -138,6 +138,19 @@ html = f"""<!doctype html>
   <div><div class="n o">{before['loss']:.2f} → {after['loss']:.4f}</div><div class="l">损失，第 0 轮到第 {after['epoch']} 轮</div></div>
   <div><div class="n">4 / 4</div><div class="l">分类正确的样本数</div></div>
 </div>
+
+<section class="card">
+  <h2>这份作业对应什么要求</h2>
+  <p>讲义第 66 页（第二篇 15 节「人工神经元网络」）的标题是「多层网络怎样学习参数？Python 实现与反向传播」，
+  给出 2-2-1 网络、两段等价实现和两个可下载脚本。该节没有附提交格式与评分标准，
+  因此本页按三条能当场核对的标准组织：</p>
+  <ol>
+    <li><strong>实现</strong>：用 <code>assets/xor-code/xor_pytorch.py</code> 的等价逻辑训练，结构、损失、优化器、轮数、精度均不改。</li>
+    <li><strong>学习过程</strong>：记录每一轮的 9 个参数和与之对应的损失，可停在任意一轮查看。</li>
+    <li><strong>可视化</strong>：判定区域、隐藏空间、损失曲线、隐藏层激活、输出概率，全部由 <code>data/metrics.json</code> 生成，不手绘。</li>
+  </ol>
+  <p class="cap">课代表另提出的两条要求（含动态演示、所有作业放在同一仓库）已分别落实在本页与上级目录。</p>
+</section>
 
 <section class="card">
   <h2>怎么复现</h2>

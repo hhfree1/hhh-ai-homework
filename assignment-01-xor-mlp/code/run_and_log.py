@@ -1,11 +1,13 @@
-"""在官方 xor_pytorch.py 的基础上加日志：每 10 轮记录一次状态。
+"""在官方 xor_pytorch.py 的基础上加日志：逐轮帧 + 每 10 轮快照。
 
-与官方脚本的唯一差别：
-  - 训练前先记录一次初始状态（epoch = 0）
-  - 每 10 轮把 loss / 隐藏层输出 / 概率追加到列表
+与官方脚本的差别只在记录，不在计算：
+  - 训练前记录一次初始状态（epoch = 0）
+  - 每轮更新完参数后，用新参数重新前向一次，记录 9 个参数与对应的 loss
+    （早期版本记的是更新前的 loss，会和参数错开一轮，已修正）
+  - 每 10 轮额外记录一份完整快照（含隐藏层输出与概率）
   - 结束后写出 data/metrics.json 与 data/final_predictions.csv
 
-计算逻辑（初值、损失、优化器、轮数）与官方脚本完全一致。
+初值、损失、优化器、轮数与官方脚本完全一致。
 """
 
 import json
@@ -52,7 +54,7 @@ def snapshot(epoch, loss_value=None):
 
 
 def compact(epoch, loss_value):
-    """给前端动画用的极简帧：九个参数 + 损失。"""
+    """给前端动画用的极简帧：九个参数 + 与这批参数对应的损失。"""
     return {
         "e": epoch,
         "l": round(float(loss_value), 5),
@@ -76,7 +78,14 @@ for epoch in range(1, 301):
     loss = F.binary_cross_entropy_with_logits(logits, target)
     loss.backward()
     optimizer.step()
-    frames.append(compact(epoch, loss.detach()))
+
+    # 参数已经变了，帧里要配"更新之后"的损失，否则读数和参数差一轮
+    with torch.no_grad():
+        hidden_after = torch.sigmoid(x @ W + b_hidden)
+        logits_after = hidden_after @ v + b_output
+        loss_after = F.binary_cross_entropy_with_logits(logits_after, target)
+    frames.append(compact(epoch, loss_after))
+
     if epoch % 10 == 0 or epoch == 1:
         history.append(snapshot(epoch))
 
