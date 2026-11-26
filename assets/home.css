@@ -1,0 +1,76 @@
+/* home.css —— 作业站首页（hhh-ai-homework/index.html） */
+
+.intro { padding: clamp(56px, 9vw, 104px) 0 0; }
+
+.intro__lead {
+  font-size: var(--fs-20);
+  line-height: 1.65;
+  max-width: 52ch;
+  margin: 0 0 16px;
+}
+
+.intro__note { max-width: 60ch; color: var(--muted); font-size: var(--fs-14); margin: 0; }
+
+.works { border-top: 1px solid var(--line); margin: clamp(48px, 7vw, 76px) 0 0; }
+
+.work {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) 190px;
+  gap: 28px;
+  align-items: start;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+
+.work__no {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--muted);
+  padding-top: 6px;
+}
+
+.work__title {
+  font-size: var(--fs-28);
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  margin: 0 0 10px;
+}
+
+.work__title a { display: inline-block; border-bottom: 1px solid transparent; transition: border-color 200ms var(--ease), color 200ms var(--ease); }
+.work:hover .work__title a { color: var(--signal); border-color: var(--signal); }
+
+.work__desc { color: var(--muted); font-size: var(--fs-14); line-height: 1.75; margin: 0; max-width: 60ch; }
+
+.work__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--muted);
+  text-align: right;
+  line-height: 1.9;
+}
+
+.work__meta b { display: block; color: var(--text); font-weight: 400; }
+
+.footnote {
+  margin: clamp(40px, 6vw, 64px) 0 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-12);
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 78ch;
+}
+
+@media (max-width: 860px) {
+  .work { grid-template-columns: 56px minmax(0, 1fr); gap: 12px 16px; }
+  .work__meta { grid-column: 2; text-align: left; }
+}
+
+@media (max-width: 520px) {
+  .work { grid-template-columns: minmax(0, 1fr); }
+  .work__no { padding-top: 0; }
+  .work__meta { grid-column: 1; }
+  .work__title { font-size: var(--fs-20); }
+}

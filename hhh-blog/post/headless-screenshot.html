@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>无头截图的四个坑 · HHH · 技术博客</title>
+<meta name="description" content="命名管道、后台任务被清扫、离屏图片不栅格化、入场动画没触发——四种「页面看起来坏了」的假象，以及一个先诊断再改的顺序。">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/blog.css">
+<link rel="alternate" type="application/rss+xml" title="HHH · 技术博客" href="../feed.xml">
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="topbar">
+  <div class="topbar__in">
+    <a class="brand" href="../index.html"><span class="brand__mark"></span>HHH / 博客</a>
+    <nav class="nav" aria-label="站内">
+      <a href="../index.html">文章</a>
+      <a href="../about.html">关于</a>
+      <a href="../differences.html">取舍</a>
+      <a href="../feed.xml">RSS</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<article class="article">
+  <div class="wrap">
+    <header class="article__head">
+      <p class="article__kicker">2026-11-26 周四 · 工具 · 调试</p>
+      <h1 class="article__title">无头截图的四个坑</h1>
+      <p class="article__sum">命名管道、后台任务被清扫、离屏图片不栅格化、入场动画没触发——四种「页面看起来坏了」的假象，以及一个先诊断再改的顺序。</p>
+      <div class="article__meta">
+        <span>1532 字</span>
+        <span>headless-screenshot.md</span>
+        <span>静态 HTML · 无外部请求</span>
+      </div>
+    </header>
+
+    <div class="body">
+<p>这一页的所有截图都来自无头浏览器，不是手工截的。踩了四个坑，每个都值得记下来，因为前三个的表现都是"看起来页面坏了"。</p>
+<h2>坑一：在沙箱里起浏览器，起不来</h2>
+<p>第一条命令直接崩：</p>
+<pre><code>FATAL:mojo\public\cpp\platform\platform_channel.cc:187 Check failed: 拒绝访问 (0x5)</code></pre>
+<p>不是端口被占，也不是参数写错。Chromium 系浏览器的进程间通信在 Windows 上走命名管道，而我当时跑命令的沙箱不允许程序打开命名管道，于是浏览器在初始化阶段就死了。</p>
+<p>判断依据是错误出在 <code>platform_channel</code>——那是建通道的地方，不是渲染、不是 GPU。换到不受限的环境里跑同一条命令，立刻正常。</p>
+<h2>坑二：后台任务会被一起杀掉</h2>
+<p>第二个坑更隐蔽。把浏览器放到后台任务里，命令立刻返回、任务状态是 <code>completed</code>、退出码 0——看起来一切正常，但 CDP 连不上，因为父进程一退出，浏览器成了孤儿并被清扫。</p>
+<p>解决办法不是"让后台任务活着"，而是别让它们分开：在<strong>同一条命令</strong>里依次启动浏览器、跑截图脚本、<code>Stop-Process</code> 收尾。三件事绑在一个进程生命周期里，父子关系成立，浏览器就不会被提前收走。</p>
+<h2>坑三：离屏的图片不栅格化</h2>
+<p>这是最坑的一个。用 <code>Page.captureScreenshot</code> 加 <code>captureBeyondViewport</code> 一次截整页，出来的图里 <code>&lt;canvas&gt;</code> 正常，<code>&lt;img&gt;</code> 全是空白。</p>
+<p>第一反应是"图片没加载"或者"路径错了"。但写了个小脚本连上 CDP，把所有 <code>&lt;img&gt;</code> 的 <code>naturalWidth / naturalHeight / 布局盒子</code> 打出来：</p>
+<pre><code>fig_net.svg        600 × 380   complete  true
+fig_loss.svg       720 × 300   complete  true
+fig_boundary.png   460 × 460   complete  true</code></pre>
+<p>图是好的，盒子也正常。问题出在截图方式：超出视口的那部分不会走完整的合成流程，离屏的图片资源没有被光栅化，而 canvas 是自己画的，所以有内容。</p>
+<p>换成"滚一段、截一段"（视口截图，不 beyond viewport）之后，四张图全部出现。代价是截一张长图要滚好几次，并且必须等每一段渲染稳定。</p>
+<h2>坑四：入场动画没触发</h2>
+<p>页面用 <code>IntersectionObserver</code> 做入场：元素进入视口才从 <code>translateY(12px) + opacity 0</code> 过渡到原位。截图脚本如果直接滚到目标位置，只有那一刻在视口里的元素被触发，其余仍是 <code>opacity: 0</code>——截图里就是大片空白。</p>
+<p>修法很土：截图前先从头滚到底，再滚回目标位置；或者干脆给截图单独加一个"全部展开"的开关。我选前者，因为它验证的是真实页面，不是特制版本。</p>
+<h2>三个小工具</h2>
+<p>都走 CDP，没有装 Playwright：</p>
+<ul><li><code>shot.mjs</code>：按 390 / 768 / 1440 三档宽度打开页面，量 <code>scrollWidth</code> 与 <code>clientWidth</code>（横向滚动）、记下所有非 <code>file:</code> 的请求、收集 console 错误，再逐段截图。</li><li><code>view.mjs</code>：滚到指定 y，截一屏视口。排查"这一块到底长什么样"时最常用。</li><li><code>diag.mjs</code>：只打诊断信息，不改样式。上面那段 <code>&lt;img&gt;</code> 的输出就是它。</li></ul>
+<p>三个脚本加起来不到两百行，够用。</p>
+<h2>顺序很重要</h2>
+<p>这四个坑排在一条线上，形状是一样的：<strong>先诊断，再改</strong>。</p>
+<p>如果坑三那次我按"图片没加载"去改路径，会白改一轮；如果坑四那次我以为是配色问题去调对比度，会白改两轮。真正省时间的动作是加一行输出——<code>naturalWidth</code> 是不是 0、<code>scrollWidth</code> 是不是大于 <code>clientWidth</code>、请求列表里有没有外链。</p>
+<p>截图是证据，不是装饰。既然要拿它当证据，就得先确认它拍到的确实是页面，而不是渲染管线的一次意外。</p>
+    </div>
+
+    <nav class="pager" aria-label="上下篇">
+      <span></span>
+      <a class="pager__item pager__item--next" href="../post/xor-mlp.html"><span class="pager__k">较早一篇</span><span class="pager__t">2-2-1 网络学 XOR：九个参数、三百轮</span></a>
+    </nav>
+  </div>
+</article>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap site-foot__in">
+    <span>2026-11-26 · 3 篇</span>
+    <span><a href="../feed.xml">feed.xml</a> · <a href="../about.html">关于这个站</a> · <a href="https://github.com/hhfree1/hhh-ai-homework">源码</a></span>
+  </div>
+</footer>
+
+<script src="../assets/blog.js" defer></script>
+</body>
+</html>

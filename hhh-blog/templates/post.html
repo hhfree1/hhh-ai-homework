@@ -1,0 +1,22 @@
+<article class="article">
+  <div class="wrap">
+    <header class="article__head">
+      <p class="article__kicker">{{DATE_LABEL}} · {{TAGS}}</p>
+      <h1 class="article__title">{{TITLE}}</h1>
+      <p class="article__sum">{{SUMMARY}}</p>
+      <div class="article__meta">
+        <span>{{WC}} 字</span>
+        <span>{{SLUG}}.md</span>
+        <span>静态 HTML · 无外部请求</span>
+      </div>
+    </header>
+
+    <div class="body">
+{{BODY}}
+    </div>
+
+    <nav class="pager" aria-label="上下篇">
+{{PAGER}}
+    </nav>
+  </div>
+</article>

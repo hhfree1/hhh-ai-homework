@@ -1,0 +1,17 @@
+<div class="wrap">
+  <div class="site-head">
+    <p class="eyebrow"><span class="eyebrow__mark"></span>技术博客 · {{COUNT}} 篇</p>
+    <h1 class="title">写得少，<br>但每个数<em>都能查</em></h1>
+    <p class="site-head__lead">三篇第一手记录：一个把页面数字全部交给构建脚本的静态站，一次 2-2-1 网络学 XOR 的完整过程，和一组无头浏览器截图的坑。</p>
+    <p class="site-head__note">没有标签页，没有站内搜索，没有评论。文章是构建期生成的静态 HTML，关掉 JavaScript 全文可读。</p>
+  </div>
+
+  <div class="list-head">
+    <span class="list-head__label">全部文章</span>
+    <span class="list-head__count">最近更新 {{UPDATED}}</span>
+  </div>
+
+  <ol class="posts">
+{{ROWS}}
+  </ol>
+</div>

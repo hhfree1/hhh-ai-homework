@@ -1,0 +1,38 @@
+<div class="wrap">
+  <div class="site-head">
+    <p class="eyebrow"><span class="eyebrow__mark"></span>关于</p>
+    <h1 class="title">一个小站，<br>三篇<em>能复现</em>的记录</h1>
+    <p class="site-head__lead">这里是 hhh-ai-homework 的博客部分。文章写的都是这个仓库里真实发生过的事：哪一页、哪个脚本、哪个数字对不上。</p>
+  </div>
+
+  <div class="section about-grid">
+    <dl>
+      <dt>这个站是什么</dt>
+      <dd>三篇文章的静态站点。文章本身是 Markdown，构建时渲染成 HTML；没有数据库，没有评论，没有统计脚本。</dd>
+
+      <dt>怎么构建</dt>
+      <dd>一个 Python 脚本读 <code class="mono">posts/posts.json</code> 与 <code class="mono">posts/&lt;slug&gt;.md</code>，渲染出列表页、文章页、RSS 和这一页。产物直接提交，克隆下来就能打开。</dd>
+
+      <dt>技术选择</dt>
+      <dd>手写 CSS 加一层设计令牌（近黑底、单一强调色、一种圆角、一套缓动）。没有框架，没有 CDN 字体，没有外部请求。</dd>
+
+      <dt>关掉 JavaScript 之后</dt>
+      <dd>全文可读。脚本只做三件事：顶部阅读进度、区块入场、代码块复制按钮。</dd>
+
+      <dt>数字从哪来</dt>
+      <dd>文章里出现的训练数字都能在 <code class="mono">assignment-01-xor-mlp/data/metrics.json</code> 里找到，并由 <code class="mono">code/verify.py</code> 的 23 项检查覆盖。</dd>
+
+      <dt>来源</dt>
+      <dd>仓库：<a class="link" href="https://github.com/hhfree1/hhh-ai-homework">github.com/hhfree1/hhh-ai-homework</a>。作业展示页与 XOR 回放台在同一仓库的另外两个目录。</dd>
+    </dl>
+
+    <div>
+      <h2 class="lead" style="margin-bottom:18px">三篇在讲什么</h2>
+      <ul class="diff">
+        <li><b>页面里的数字，一个都不许手写</b>：301 帧、9632 个数，全部由脚本注入；代价是模板不能直接预览，收益是改样式时不会碰坏数字。</li>
+        <li><b>2-2-1 网络学 XOR</b>：九个参数逐帧记录，末轮隐藏层把四个点搬到两个簇；20 次随机初值里 9 次学会，失败的 11 次停在 0.69。</li>
+        <li><b>无头截图的四个坑</b>：命名管道、后台任务被清扫、离屏图片不栅格化、入场动画没触发。四个坑的表现都是「页面看起来坏了」。</li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>五款 Agent 的用法与证据</title>
+<meta name="description" content="DeepSeek Harness、WorkBuddy、Codex、Trae、Claude 五款 Agent 的真实使用记录：各自被分到哪一段活、一次完整交付拆解、一张只有 8 格能核实的事实矩阵、两次具体失败。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="五款 Agent 的用法与证据">
+<meta property="og:description" content="只写能读到、能打开、能重算的东西；读不到的一律标待核。">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0D10'/%3E%3Crect x='3' y='3' width='10' height='10' fill='none' stroke='%233DDC97'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/agent.css">
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="topbar">
+  <div class="topbar__in">
+    <a class="brand" href="../index.html"><span class="brand__mark"></span>HHH / 附加 A</a>
+    <nav class="nav" aria-label="站点导航">
+      <a href="../index.html">目录</a>
+      <a href="../assignment-01-xor-mlp/index.html">作业 01</a>
+      <a href="../hhh-blog/index.html">博客</a>
+      <a href="./index.html" aria-current="page">Agent</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================= 首屏 ================= -->
+  <section class="hero">
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="wrap hero__in">
+      <p class="eyebrow"><span class="eyebrow__mark"></span>附加 A · 工具实测</p>
+      <h1 class="title title--ag">五款 Agent，<br><em>三件交得出东西</em></h1>
+      <p class="hero__lead">一款主要用来设计网页，一款网页、PPT、辅助学习的自动化程序都做，一款专写工作计划和提示词——这是我自己分给它们的三段活。另外两款只作对照，不是主力。这一页写清楚「我拿它干什么」，也写清楚哪些说法我拿不出证据。</p>
+      <div class="strip">
+        <span><b>05</b> 款工具</span>
+        <span class="strip__sep">/</span>
+        <span><b>03</b> 张实拍截图</span>
+        <span class="strip__sep">/</span>
+        <span><b>9.5 KB</b> 研究纪要 · 19 个来源</span>
+        <span class="strip__sep">/</span>
+        <span><b>03</b> 次定时任务失败</span>
+      </div>
+      <div class="names">
+        <div class="names__item">
+          <span class="names__name">DeepSeek Harness</span>
+          <span class="names__meta">主力 · 网页</span>
+        </div>
+        <div class="names__item">
+          <span class="names__name">WorkBuddy</span>
+          <span class="names__meta">主力 · 网页/PPT/自动化</span>
+        </div>
+        <div class="names__item">
+          <span class="names__name">Codex</span>
+          <span class="names__meta">主力 · 计划与提示词</span>
+        </div>
+        <div class="names__item">
+          <span class="names__name">Trae</span>
+          <span class="names__meta">非主力 · AI IDE</span>
+        </div>
+        <div class="names__item">
+          <span class="names__name">Claude</span>
+          <span class="names__meta">非主力 · 对话助手</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 01 动机 ================= -->
+  <section class="section" id="why">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">01 / 07</span><span class="rail__line"></span><span class="rail__label">动机</span>
+      </div>
+      <div class="prose reveal">
+        <h2 class="lead lead--22">起初只想少写点重复代码。用了一周才发现，五款工具的差别不在谁更聪明，而在你把它放进流程的哪一段：谁负责产出、谁负责规划、谁只是备选。</h2>
+        <p class="muted">于是把这一周里留下的记录摊开：一边是能指到产物的任务，一边只剩一句会话标题。下面三个日期，是这些记录里唯一带时间的信息。</p>
+      </div>
+      <ol class="timeline reveal" data-stagger>
+        <li>
+          <span class="timeline__date">2026-11-02</span>
+          <div class="timeline__what">WorkBuddy 交付《研究纪要》<span>9.5 KB，列出 19 个来源，覆盖 ymcui/Chinese-LLaMA-Alpaca 与 trigaten/Learn_Prompting。<sup class="src">S-02</sup></span></div>
+        </li>
+        <li>
+          <span class="timeline__date">11-09 / 11-16 / 11-23</span>
+          <div class="timeline__what">同一个定时任务连着三周没跑成<span>运行记录里三行都是「原定时间设备未在线，重试仍未成功」，下次排到 11-30。<sup class="src">S-02</sup></span></div>
+        </li>
+        <li>
+          <span class="timeline__date">2026-11-26</span>
+          <div class="timeline__what">Harness 的「动态设计」会话交出 4 件产物<span>页面、24 秒视频、说明文件、分镜图；同一天三张截图归档，成为这一页唯一的证据。<sup class="src">S-01</sup></span></div>
+        </li>
+      </ol>
+      <p class="tiny muted mt16 measure-72">时间线没有「第一次安装」这一步：安装日期没有记录，写上去就只能是编的。图上三个日期全部来自 S-02 的会话标题与运行记录，以及 S-01 的产物列表。</p>
+    </div>
+  </section>
+
+  <!-- ================= 02 五张卡 ================= -->
+  <section class="section" id="agents">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">02 / 07</span><span class="rail__line"></span><span class="rail__label">五张卡</span>
+      </div>
+      <p class="prose muted mb28">每张卡固定几个字段，不打分、不排座次。前三张能指到产物或文件（<sup class="src">S-01</sup>/<sup class="src">S-02</sup>/<sup class="src">S-03</sup>），后两张按你的要求只写定位——「不是主力」本身就是结论。</p>
+
+      <div class="agents reveal" data-stagger>
+        <article class="agent">
+          <div class="agent__top">
+            <h3 class="agent__name">DeepSeek Harness</h3>
+            <span class="agent__tag agent__tag--real">有产物</span>
+          </div>
+          <p class="agent__ver">桌面版 · DeepSeek-V4.1-Flash<sup class="src">S-01</sup></p>
+
+          <div class="field">
+            <span class="field__k">它能干什么</span>
+            <p class="field__v">桌面端 Agent 客户端：读本地文件、写代码、跑无头浏览器渲染，产物直接落到工作目录；一条链路能从源码走到成片。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">我用它做什么</span>
+            <p class="field__v"><b>主要用来设计网页。</b>这个仓库里的三页就是它写的：改 CSS、跑 390/768/1440 三档截图、按检查清单逐条修。更早的一次「动态设计」交付 4 件：<span class="mono">index.html</span>（静音自动播放、循环、点击暂停、双击全屏）、<span class="mono">motioncraft.mp4</span>（24.00 s / 1920×1080 / 30 fps / H.264 / 13 MB / 首尾帧一致）、<span class="mono">README.md</span>、<span class="mono">storyboard.jpg</span>。引擎是纯函数 <span class="mono">render(ctx,t)</span>，12 栏网格，缓动 <span class="mono">cubic-bezier(0.16,1,0.3,1)</span>。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">它不适合干什么</span>
+            <p class="field__v field__v--dim">不替你把关「看起来对」的地方。编码器缺失、末帧没黑，都是靠数字判据才发现的，不是靠它自述完成。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">一句话评价</span>
+            <p class="field__v">能把多媒体产物一路做到可交付，代价是每一步都要有人核数。</p>
+          </div>
+        </article>
+
+        <article class="agent">
+          <div class="agent__top">
+            <h3 class="agent__name">WorkBuddy</h3>
+            <span class="agent__tag agent__tag--real">有产物</span>
+          </div>
+          <p class="agent__ver">5.1.13 · Hy4 flash<sup class="src">S-02</sup></p>
+
+          <div class="field">
+            <span class="field__k">它能干什么</span>
+            <p class="field__v">按主题做资料研究并交文档：抓来源、写成纪要、把引用列在文末；也能做 PPT、写辅助日常学习的自动化程序。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">我用它做什么</span>
+            <p class="field__v"><b>设计网页、做 PPT、写自动化程序辅助学习。</b>有记录的一次是「语言库-GitHub研究(A轨)」：交付 <span class="mono">2026-11-02-研究纪要.md</span>，9.5 KB、19 个来源，研究 <span class="mono">ymcui/Chinese-LLaMA-Alpaca</span> 与 <span class="mono">trigaten/Learn_Prompting</span>，提炼出 P1–P7 七条原则。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">它不适合干什么</span>
+            <p class="field__v field__v--dim">不适合把「定时」当承诺：它依赖设备在线，人不在机器前，任务就停在原定时间。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">一句话评价</span>
+            <p class="field__v">研究类任务交得完整，但定时空转过三次，第四次还没到点。</p>
+          </div>
+        </article>
+
+        <article class="agent">
+          <div class="agent__top">
+            <h3 class="agent__name">Codex</h3>
+            <span class="agent__tag agent__tag--real">有文档</span>
+          </div>
+          <p class="agent__ver">桌面版 · 模型显示「6 Luna 中」<sup class="src">S-03</sup></p>
+
+          <div class="field">
+            <span class="field__k">它能干什么</span>
+            <p class="field__v">在本地项目目录里读写文件、跑命令、产出文档；界面是项目 + 会话，适合一次盯一个任务往下推。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">我用它做什么</span>
+            <p class="field__v"><b>设计工作计划和提示词，再拿去配其他 agent 干活。</b>这一轮的提示词修订稿就是它写的：<span class="mono">prompt-revision-plan.md</span> 共 75 行——优先级 B→A→C、四类事实标签、P0–P6 阶段表、每阶段四段式汇报格式。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">它不适合干什么</span>
+            <p class="field__v field__v--dim">命令执行、定时、发布都没有留下可核的记录，只能写「待实测」；它交的是「怎么干」的文档，不是成品网页。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">一句话评价</span>
+            <p class="field__v">判断它有没有用，不看文档写得多顺，要看下一轮别的 agent 照着干得顺不顺。</p>
+          </div>
+        </article>
+
+        <article class="agent">
+          <div class="agent__top">
+            <h3 class="agent__name">Trae</h3>
+            <span class="agent__tag">非主力</span>
+          </div>
+          <p class="agent__ver">字节跳动的 AI IDE · 无截图、无产物</p>
+
+          <div class="field">
+            <span class="field__k">它能干什么</span>
+            <p class="field__v field__v--dim">把编辑器、对话和 Agent 模式放在一起的 IDE：在仓库里直接改文件、看 diff、让 Agent 自己跑一轮。定位是「在编辑器里写代码」。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">为什么不是主力</span>
+            <p class="field__v field__v--dim">我现在的活主要是网页设计、PPT 和计划文档，起点是空白文件而不是已有仓库，用不上 IDE 的强项。工作区里没有它的截图或产物——这是我的记录缺口，不是它的缺点。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">什么时候会用它</span>
+            <p class="field__v field__v--dim">手上有别人写好、需要改动的代码仓库时。那时 IDE 里的 diff 和跳转比对话框有用。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">什么时候会用它</span>
+            <p class="field__v field__v--dim">手上有别人写好、需要改动的代码仓库时。那时 IDE 里的 diff 和跳转比对话框有用。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">一句话</span>
+            <p class="field__v">留作候选：哪天要在一个成熟仓库里做重构，才有东西可测。</p>
+          </div>
+        </article>
+
+        <article class="agent agent--wide">
+          <div class="agent__top">
+            <h3 class="agent__name">Claude</h3>
+            <span class="agent__tag">非主力</span>
+          </div>
+          <p class="agent__ver">Anthropic · 网页与桌面端对话助手</p>
+
+          <div class="field">
+            <span class="field__k">它能干什么</span>
+            <p class="field__v field__v--dim">长文读写、代码解释与改写、把一段散着的文字整理成结构；Artifacts 能把生成的页面或图表当场渲染出来看。强项是「一次对话里的质量」。</p>
+          </div>
+          <div class="field">
+            <span class="field__k">为什么不是主力</span>
+            <p class="field__v field__v--dim">它不在我的日常产出链路上：改文件、跑命令、截图复核这些活要的是本地工作区，不是对话框。我只用它对照参考答案、读长文档，不拿它交产物。</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 一次任务拆解 ================= -->
+  <section class="section" id="task">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">03 / 07</span><span class="rail__line"></span><span class="rail__label">一次任务拆解</span>
+      </div>
+      <p class="prose muted mb28">拆的是 Harness 的「动态设计」任务：需求、执行、产出、人工修改、结果。每一步标出谁在做，以及这一步的耗时——没有记录的耗时写「待实测」，不编。</p>
+
+      <ol class="steps reveal" data-stagger>
+        <li>
+          <span class="steps__no">01</span>
+          <div>
+            <h3 class="steps__title">需求：24 秒、静音、首尾能接上</h3>
+            <p class="steps__body">要一段循环播放的动效成片，1920×1080，30 fps，无音轨；难点在首尾帧必须一致，否则循环时会跳一下。</p>
+          </div>
+          <span class="steps__meta"><b>我（人）</b>耗时 待实测</span>
+        </li>
+        <li>
+          <span class="steps__no">02</span>
+          <div>
+            <h3 class="steps__title">执行：把动画写成时间的函数</h3>
+            <p class="steps__body">引擎是 <span class="mono">src/motion.js</span> 里的纯函数 <span class="mono">render(ctx, t)</span>——给同一个 t 必得同一帧。版式用 12 栏网格，缓动 <span class="mono">cubic-bezier(0.16,1,0.3,1)</span>。</p>
+          </div>
+          <span class="steps__meta"><b>Harness</b>耗时 待实测</span>
+        </li>
+        <li>
+          <span class="steps__no">03</span>
+          <div>
+            <h3 class="steps__title">产出：720 帧，编码成片</h3>
+            <p class="steps__body">逐帧导出 720 张图再交给 ffmpeg。无头 Edge 渲染 0.13 s/帧，整段导出约 96 s，最终 24.00 s / 13 MB / H.264。</p>
+          </div>
+          <span class="steps__meta"><b>Harness</b>约 96 s（仅导出）</span>
+        </li>
+        <li>
+          <span class="steps__no">04</span>
+          <div>
+            <h3 class="steps__title">人工修改：末帧其实没黑</h3>
+            <p class="steps__body">想用末帧全黑来做首尾对齐，结果 <span class="mono">globalAlpha</span> 被后续赋值覆盖，末帧并不黑。改用「相机回到首帧位置后比对，<span class="mono">diff=0.0</span>」当判据，绕开肉眼。</p>
+          </div>
+          <span class="steps__meta"><b>人 + Harness</b>耗时 待实测</span>
+        </li>
+        <li>
+          <span class="steps__no">05</span>
+          <div>
+            <h3 class="steps__title">结果：四件产物，一件可播放</h3>
+            <p class="steps__body">成片 <span class="mono">motioncraft.mp4</span> 与它的宿主页 <span class="mono">index.html</span>（静音自动播放、循环、点击暂停、双击全屏）；另有 <span class="mono">README.md</span> 与 <span class="mono">storyboard.jpg</span>。</p>
+          </div>
+          <span class="steps__meta"><b>Harness</b>耗时 待实测</span>
+        </li>
+      </ol>
+      <p class="tiny muted mt14 measure-72">整段任务从开口到收工用了多久，截图里没有这个数字，所以这里也没有。能核实的只有导出环节的 96 秒与 0.13 秒/帧，二者都由工具状态栏给出。</p>
+    </div>
+  </section>
+
+  <!-- ================= 04 事实矩阵 ================= -->
+  <section class="section" id="matrix">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">04 / 07</span><span class="rail__line"></span><span class="rail__label">事实矩阵</span>
+      </div>
+      <p class="prose muted mb24">只放能判真假的事实维度，没有评分、星级、十分制。30 格里能核实的 8 格写成「是」，其余 22 格没有证据，一律写「待核」——不是没试过，是没留下记录。最后一行来自你今天的答复，标 <sup class="src">S-04</sup>。</p>
+
+      <div class="panel reveal">
+        <div class="matrix__wrap">
+          <table class="matrix">
+            <caption class="sr-only">五款工具的事实矩阵：能否读本地文件、执行命令、定时运行、直接发布、需要付费、中文界面，以及我主要拿它做什么</caption>
+            <thead>
+              <tr>
+                <th scope="col">维度</th>
+                <th scope="col">Harness</th>
+                <th scope="col">WorkBuddy</th>
+                <th scope="col">Codex</th>
+                <th scope="col">Trae</th>
+                <th scope="col">Claude</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">能读本地文件并写出产物</th>
+                <td class="yes">是<sup class="src">S-01</sup></td>
+                <td class="yes">是<sup class="src">S-02</sup></td>
+                <td class="yes">是<sup class="src">S-03</sup></td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+              </tr>
+              <tr>
+                <th scope="row">能执行命令或脚本</th>
+                <td class="yes">是<sup class="src">S-01</sup></td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+              </tr>
+              <tr>
+                <th scope="row">能按时间自己跑起来</th>
+                <td class="unk">待核</td>
+                <td class="yes">是<sup class="src">S-02</sup></td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+              </tr>
+              <tr>
+                <th scope="row">能直接把页面发布到网上</th>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+              </tr>
+              <tr>
+                <th scope="row">需要付费才能用</th>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+              </tr>
+              <tr>
+                <th scope="row">中文界面</th>
+                <td class="yes">是<sup class="src">S-01</sup></td>
+                <td class="yes">是<sup class="src">S-02</sup></td>
+                <td class="yes">是<sup class="src">S-03</sup></td>
+                <td class="unk">待核</td>
+                <td class="unk">待核</td>
+              </tr>
+              <tr>
+                <th scope="row">我主要拿它做什么</th>
+                <td class="text">设计网页</td>
+                <td class="text">网页 · PPT · 自动化</td>
+                <td class="text">计划与提示词</td>
+                <td class="text">不用</td>
+                <td class="text">不用</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="panel__note">「能按时间自己跑起来」对 WorkBuddy 写成「是」，是因为运行记录里确实有原定时间与「下次 11-30」——能力在，三次都没跑成，失败细节见下一屏。价格一栏五格全空，因为三张截图里没有任何价格信息。最后一行不是能力，是分工。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 05 失败与边界 ================= -->
+  <section class="section" id="failures">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">05 / 07</span><span class="rail__line"></span><span class="rail__label">失败与边界</span>
+      </div>
+      <div class="cases reveal" data-stagger>
+        <article class="case">
+          <p class="case__k">失败 01 · S-02</p>
+          <h3 class="case__h">定时任务连着三周没跑成</h3>
+          <p><strong class="mono muted">做错什么</strong>：把「原定时间自动执行」当成默认可用的能力。11-09、11-16、11-23 三次都卡在同一处——设备未在线，重试也没成功。</p>
+          <p><strong class="mono muted">怎么发现</strong>：右侧运行记录里三行文字完全一样，每次都会写下「下次 11-30」。三天连着出现同一句，就不是偶发了。</p>
+          <p><strong class="mono muted">怎么补救</strong>：目前没有成功记录。日志只给出下一次排期，说明它把这件事交给了时间，而不是交给了问题本身。</p>
+        </article>
+        <article class="case">
+          <p class="case__k">失败 02 · S-01</p>
+          <h3 class="case__h">最后一帧看着黑，其实没黑</h3>
+          <p><strong class="mono muted">做错什么</strong>：用「末帧全黑」来做首尾对齐，但 <span class="mono">globalAlpha</span> 被后面的赋值覆盖了，末帧并没有真正黑掉。</p>
+          <p><strong class="mono muted">怎么发现</strong>：肉眼看不出差别。改成一个可算的判据——相机回到首帧位置后取 <span class="mono">diff</span>，得到的 <span class="mono">diff=0.0</span> 才说明接上了。</p>
+          <p><strong class="mono muted">怎么补救</strong>：把判据换成数字，从此不再靠眼睛验收循环点。同一轮里还踩到 ffmpeg 缺 PNG 解码器，改走 444 JPEG 中转才导出成功。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 06 收尾 ================= -->
+  <section class="section" id="exits">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">06 / 07</span><span class="rail__line"></span><span class="rail__label">入口</span>
+      </div>
+      <div class="exits reveal" data-stagger>
+        <a class="exit" href="../assignment-01-xor-mlp/index.html">
+          <span class="exit__k">作业 01 / MLP</span>
+          <span class="exit__t">2-2-1 网络学 XOR</span>
+          <span class="exit__d">300 轮逐帧回放、决策边界、梯度箭头，数字全部由脚本注入。</span>
+        </a>
+        <a class="exit" href="../hhh-blog/index.html">
+          <span class="exit__k">技术博客</span>
+          <span class="exit__t">hhh-blog</span>
+          <span class="exit__d">三篇文章，两篇带复算脚本；构建幂等，HTML 里没有手写数字。</span>
+        </a>
+        <a class="exit" href="https://github.com/hhfree1/hhh-ai-homework">
+          <span class="exit__k">仓库 / GitHub</span>
+          <span class="exit__t">hhh-ai-homework</span>
+          <span class="exit__d">本页与作业 01 同仓，含生成脚本、数据与核验脚本。</span>
+        </a>
+      </div>
+
+      <div class="panel mt24">
+        <div class="panel__head"><span class="dot"></span>分工说明</div>
+        <div class="panel__body">
+          <p class="prose tight">这些页面本身也是 Agent 协作的产物：结构、文案初稿与代码由 Agent 起草，事实核对、参数取舍、放行由人负责。页面上的每一个数字，要么来自 <span class="mono">data/metrics.json</span>（由脚本注入），要么是截图里的原文摘录——两者都能指回去。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 07 差异说明 ================= -->
+  <section class="section" id="diff">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">07 / 07</span><span class="rail__line"></span><span class="rail__label">与参考站的不同</span>
+      </div>
+      <p class="prose muted mb24">参考站 <span class="mono">lianliu1016.github.io/1111</span> 给的是同类作业的完成度上限。借它的信息结构与叙事节奏，视觉与文案自建；下面七条是可核对的差别。</p>
+
+      <div class="panel reveal">
+        <div class="tbl__scroll">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th scope="col">维度</th>
+                <th scope="col">参考站的做法</th>
+                <th scope="col">这里的做法</th>
+                <th scope="col">为什么不同</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>首屏统计</td>
+                <td>三栏大数字，无 JS 时渲染成 0（「0 款 AI Agent」）</td>
+                <td>一行事实带，纯静态文本，无 JS 也是 04 / 03 / 9.5 KB / 03</td>
+                <td>数字先于脚本存在，才不会在慢网络下变成零</td>
+              </tr>
+              <tr>
+                <td>评分体系</td>
+                <td>六维雷达图，正文没有对应分值与依据</td>
+                <td>只做事实矩阵，6 维度 × 4 工具 = 24 格，能核实的 7 格写「是」</td>
+                <td>没有依据的分值不如留空，空格本身是信息</td>
+              </tr>
+              <tr>
+                <td>卡片字段</td>
+                <td>优点 / 短板 / 截图灯箱 + 场景速查</td>
+                <td>固定四字段：能干什么 / 干过什么 / 不适合干什么 / 一句话</td>
+                <td>四个字段都能被截图证伪，「优点」不能</td>
+              </tr>
+              <tr>
+                <td>视觉语言</td>
+                <td>暗色极光 + 吉祥物插画 + 可爱化命名</td>
+                <td>近黑底 + 单一信号色 + 1px 描边 + 等宽数字，无插画</td>
+                <td>你要求简洁有科技感；插画会把注意力从数据上带走</td>
+              </tr>
+              <tr>
+                <td>缺素材时</td>
+                <td>仍展示截图墙，来源无法核对</td>
+                <td>缺截图就写「待实测」并给出测试计划，不放占位图</td>
+                <td>占位图会让「未完成」看起来像「已完成」</td>
+              </tr>
+              <tr>
+                <td>动效</td>
+                <td>首屏与卡片多处常驻动效</td>
+                <td>只有入场（420ms / 12px）与滚动进度条，reduced-motion 下全部关掉</td>
+                <td>动效只用来标节奏，不用来当装饰</td>
+              </tr>
+              <tr>
+                <td>失败案例</td>
+                <td>无独立章节</td>
+                <td>单列一屏，两个失败都带日期与原文摘录</td>
+                <td>失败能核对，好评不能</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 来源 ================= -->
+  <section class="section" id="sources">
+    <div class="wrap">
+      <div class="rail" aria-hidden="true">
+        <span class="rail__no">附录</span><span class="rail__line"></span><span class="rail__label">来源</span>
+      </div>
+      <ul class="prose tiny muted plain">
+        <li class="mb10"><span class="mono signal">S-01</span>　DeepSeek Harness 桌面版「动态设计」会话截图（2026-11-26）：4 件产物、视频参数、引擎与缓动、720 帧导出耗时、三个踩坑、状态栏 4 轮 203 步 / 270 tok/s / 18.9M tok / 缓存命中 99% / DeepSeek-V4.1-Flash。</li>
+        <li class="mb10"><span class="mono signal">S-02</span>　WorkBuddy 5.1.13「语言库-GitHub研究(A轨)」截图：交付文件与 9.5 KB / 19 个来源、研究仓库名、P1–P7、运行记录三行失败与下次 11-30、模型 Hy4 flash。</li>
+        <li class="mb10"><span class="mono signal">S-03</span>　Codex 桌面版空状态截图：会话标题「实测 yt-dlp 并发下载性能」、「项目：没有项目」、「我们要构建什么？」、「6 Luna 中」；以及它产出的 <span class="mono">prompt-revision-plan.md</span>（75 行）。</li>
+        <li class="mb10"><span class="mono signal">S-04</span>　用户口述（2026-11-26）：Harness 主要设计网页；WorkBuddy 做网页、PPT、辅助学习的自动化程序；Codex 做工作计划与提示词、配合其他 agent；Trae 与 Claude 只作对照，不是主力。</li>
+        <li><span class="mono">说明</span>　三张截图尚未入库（脱敏范围待确认），本页只引用其中可读到的文字；不据此推断耗时、满意度或任务成败。S-04 是口述，不是第三方核验。</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <span>附加 A · 五款 Agent 的用法与证据 · <span class="mono">2026-11-26</span></span>
+    <span class="mono tiny">HHH / 01</span>
+  </div>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

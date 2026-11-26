@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2-2-1 网络学 XOR：九个参数、三百轮 · HHH · 技术博客</title>
+<meta name="description" content="两条直线就够了。九个参数逐帧记下来，20 次随机初值里失败的 11 次，还有一次把梯度写错、收敛得很漂亮却对不上记录的经历。">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/blog.css">
+<link rel="alternate" type="application/rss+xml" title="HHH · 技术博客" href="../feed.xml">
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="topbar">
+  <div class="topbar__in">
+    <a class="brand" href="../index.html"><span class="brand__mark"></span>HHH / 博客</a>
+    <nav class="nav" aria-label="站内">
+      <a href="../index.html">文章</a>
+      <a href="../about.html">关于</a>
+      <a href="../differences.html">取舍</a>
+      <a href="../feed.xml">RSS</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<article class="article">
+  <div class="wrap">
+    <header class="article__head">
+      <p class="article__kicker">2026-11-25 周三 · 神经网络 · 复现</p>
+      <h1 class="article__title">2-2-1 网络学 XOR：九个参数、三百轮</h1>
+      <p class="article__sum">两条直线就够了。九个参数逐帧记下来，20 次随机初值里失败的 11 次，还有一次把梯度写错、收敛得很漂亮却对不上记录的经历。</p>
+      <div class="article__meta">
+        <span>1788 字</span>
+        <span>xor-mlp.md</span>
+        <span>静态 HTML · 无外部请求</span>
+      </div>
+    </header>
+
+    <div class="body">
+<p>四点、九个参数、一条命令。</p>
+<p>XOR 是那类"看起来简单、写起来会翻车"的题目：四个点 (0,0)、(0,1)、(1,0)、(1,1)，标签 0、1、1、0。任何一条直线最多把其中三个分对——这是单层感知机学不会它的原因，不是训练不够久。</p>
+<p>两条线就够了。所以网络是 2-2-1：两个输入、两个隐藏神经元、一个输出。</p>
+<h2>为什么两个隐藏单元刚好够</h2>
+<p>每个隐藏单元各自是一条直线：输入落在它哪一侧，决定它在这一维上的坐标。两个单元各画一条线，原来的二维平面就被搬到一个新的二维平面上；在这个空间里，两个对角线类各占一个角，用一条线就能切开。</p>
+<p>参数一共九个：</p>
+<ul><li>输入到隐藏：2×2 的权重 <code>W</code>，加 2 个偏置 <code>bh</code>；</li><li>隐藏到输出：2 个权重 <code>v</code>，加 1 个偏置 <code>bo</code>。</li></ul>
+<p>用 <code>W=[[2,-2],[-2,2]]</code>、<code>bh=(-1,-1)</code>、<code>v=(3,3)</code>、<code>bo=-2.5</code> 起步——不是随机数，是手写的常数，第 6 节单独说为什么。</p>
+<h2>训练</h2>
+<p>损失是交叉熵（BCE），对 4 个样本取平均；优化器 Adam，<code>lr=0.03</code>、<code>betas=(0.9,0.999)</code>、<code>eps=1e-8</code>，<code>float64</code>；300 轮全批量，每轮一次参数更新。</p>
+<p>结果是：</p>
+<pre><code>初值   0.5620
+终值   0.0279
+p      0.0287  0.9745  0.9745  0.0305
+参数   W00 6.1371  W01 -6.0140  W10 -6.0140  W11 6.1371
+       bh0 -3.4727  bh1 -3.4727
+       v0 8.1918    v1 8.1918    bo -4.0141</code></pre>
+<p>四个样本全部判对，离 0.5 最近的那个差了 0.4695。</p>
+<p>末轮把四个点搬到隐藏空间的位置是这样的：</p>
+<pre><code>(0,0) → (0.0301, 0.0301)
+(1,1) → (0.0339, 0.0339)
+(0,1) → (0.0001, 0.9349)
+(1,0) → (0.9349, 0.0001)</code></pre>
+<p>(0,0) 和 (1,1) 几乎落在同一个点上——它们本来就是同一类，合成一点不影响分类。真正的两类被拆成"原点附近"和"两条坐标轴上的远端"，一条 <code>v·h + bo = 0</code> 的线就能把它们分开。</p>
+<h2>九个参数，全都点得动</h2>
+<p>页面里 9 个参数每一轮都记了值，所以回放台不是把一段视频贴上来：拖时间轴，画布重算；隐藏层散点图、决策边界、概率条，全部来自同一帧的 9 个数。</p>
+<p>也正因为每帧都记，梯度不需要"用前后两帧的位置差反推"。第 5 节那 9 个条子就是训练循环里优化器更新前那一手的梯度原值，第 0 轮：</p>
+<pre><code>W00 -0.0367   W01 +0.0247
+W10 +0.0247   W11 -0.0367
+bh0 -0.0120   bh1 -0.0120
+v0  -0.0661   v1  -0.0661
+bo  -0.1246</code></pre>
+<h2>随机初值：20 次里 9 次学会</h2>
+<p>把手写初值换成随机数：<code>W ~ N(0,2)</code>、<code>bh ~ N(0,1)</code>、<code>v ~ N(0,2)</code>、<code>bo ~ N(0,1)</code>，其余不动，跑 20 个种子。</p>
+<p>9 次学会，11 次没学会。失败的种子是 0、4、5、6、7、8、10、11、12、14、16，它们都停在 0.69 附近的损失上——正好是"四个样本全判 0.5"的交叉熵，也就是网络什么都没学到。</p>
+<p>这不是代码 bug，是 2 个隐藏单元的自由度太小：初值一旦把两个单元放到几乎同一条线上，它们就再也分不出两条线。固定初值不是偷懒，是为了让这份作业每次讲同一件事。</p>
+<h2>一次算错的经历</h2>
+<p>我最先写的梯度是这样的：先令 <code>dL/dp = (p-y)/(p(1-p))</code>，但输出层不再乘 <code>p(1-p)</code>。训练也能收敛，终值 0.0095、<code>v=12.68</code>——数字很漂亮，和已有记录对不上。</p>
+<p>换成把 MSE 当目标、又在输出层乘一次 <code>p(1-p)</code>，终值 0.0608、<code>v=6.83</code>，还是对不上。</p>
+<p>原因是我当时没意识到 Adam 对梯度的整体缩放不敏感：少一个 <code>1/n</code>、多一个 <code>p(1-p)</code>，训练照样收敛，只是每个样本的权重变了，末态就飘。只有严格按 BCE 的链式来——<code>dL/dz_out = (p - y)</code>，隐藏层再乘 <code>h(1-h)</code>——九个参数才逐位复现出记录的终态。</p>
+<p>这件事的教训不是"公式要小心"，而是：<strong>收敛不是正确性证据</strong>。要证明实现对了，得有一个能逐位比对的外部记录。</p>
+<h2>复现</h2>
+<pre><code>python code/run_and_log.py     # 训练，写 data/metrics.json
+python code/build_page.py      # 填页面，画四张图
+python code/verify.py          # 23 项检查，全过才 0</code></pre>
+<p>同一个环境下连跑两次，<code>data/metrics.json</code> 逐字节一致——没有时间戳，没有随机数，种子只用在随机初值那组实验里。</p>
+    </div>
+
+    <nav class="pager" aria-label="上下篇">
+      <a class="pager__item" href="../post/headless-screenshot.html"><span class="pager__k">较新一篇</span><span class="pager__t">无头截图的四个坑</span></a>
+      <a class="pager__item pager__item--next" href="../post/numbers-not-typed.html"><span class="pager__k">较早一篇</span><span class="pager__t">页面里的数字，一个都不许手写</span></a>
+    </nav>
+  </div>
+</article>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap site-foot__in">
+    <span>2026-11-26 · 3 篇</span>
+    <span><a href="../feed.xml">feed.xml</a> · <a href="../about.html">关于这个站</a> · <a href="https://github.com/hhfree1/hhh-ai-homework">源码</a></span>
+  </div>
+</footer>
+
+<script src="../assets/blog.js" defer></script>
+</body>
+</html>

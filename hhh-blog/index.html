@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HHH · 技术博客 · 全部文章</title>
+<meta name="description" content="三篇第一手记录：把数字交给构建脚本、2-2-1 网络学 XOR、无头截图的四个坑。">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/blog.css">
+<link rel="alternate" type="application/rss+xml" title="HHH · 技术博客" href="feed.xml">
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="topbar">
+  <div class="topbar__in">
+    <a class="brand" href="index.html"><span class="brand__mark"></span>HHH / 博客</a>
+    <nav class="nav" aria-label="站内">
+      <a href="index.html">文章</a>
+      <a href="about.html">关于</a>
+      <a href="differences.html">取舍</a>
+      <a href="feed.xml">RSS</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<div class="wrap">
+  <div class="site-head">
+    <p class="eyebrow"><span class="eyebrow__mark"></span>技术博客 · 3 篇</p>
+    <h1 class="title">写得少，<br>但每个数<em>都能查</em></h1>
+    <p class="site-head__lead">三篇第一手记录：一个把页面数字全部交给构建脚本的静态站，一次 2-2-1 网络学 XOR 的完整过程，和一组无头浏览器截图的坑。</p>
+    <p class="site-head__note">没有标签页，没有站内搜索，没有评论。文章是构建期生成的静态 HTML，关掉 JavaScript 全文可读。</p>
+  </div>
+
+  <div class="list-head">
+    <span class="list-head__label">全部文章</span>
+    <span class="list-head__count">最近更新 2026-11-26</span>
+  </div>
+
+  <ol class="posts">
+    <li>
+      <article class="post-row reveal">
+        <time class="post-row__date" datetime="2026-11-26">2026-11-26</time>
+        <div>
+          <h2 class="post-row__title"><a href="post/headless-screenshot.html">无头截图的四个坑</a></h2>
+          <p class="post-row__sum">命名管道、后台任务被清扫、离屏图片不栅格化、入场动画没触发——四种「页面看起来坏了」的假象，以及一个先诊断再改的顺序。</p>
+        </div>
+        <span class="post-row__meta">1532 字<br>工具 · 调试</span>
+      </article>
+    </li>
+    <li>
+      <article class="post-row reveal">
+        <time class="post-row__date" datetime="2026-11-25">2026-11-25</time>
+        <div>
+          <h2 class="post-row__title"><a href="post/xor-mlp.html">2-2-1 网络学 XOR：九个参数、三百轮</a></h2>
+          <p class="post-row__sum">两条直线就够了。九个参数逐帧记下来，20 次随机初值里失败的 11 次，还有一次把梯度写错、收敛得很漂亮却对不上记录的经历。</p>
+        </div>
+        <span class="post-row__meta">1788 字<br>神经网络 · 复现</span>
+      </article>
+    </li>
+    <li>
+      <article class="post-row reveal">
+        <time class="post-row__date" datetime="2026-11-24">2026-11-24</time>
+        <div>
+          <h2 class="post-row__title"><a href="post/numbers-not-typed.html">页面里的数字，一个都不许手写</a></h2>
+          <p class="post-row__sum">301 帧、9632 个数、23 项检查：把静态页面上的每个数字交给构建脚本，代价和收益分别是什么。</p>
+        </div>
+        <span class="post-row__meta">1578 字<br>构建 · 可验证性</span>
+      </article>
+    </li>
+  </ol>
+</div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap site-foot__in">
+    <span>2026-11-26 · 3 篇</span>
+    <span><a href="feed.xml">feed.xml</a> · <a href="about.html">关于这个站</a> · <a href="https://github.com/hhfree1/hhh-ai-homework">源码</a></span>
+  </div>
+</footer>
+
+<script src="assets/blog.js" defer></script>
+</body>
+</html>

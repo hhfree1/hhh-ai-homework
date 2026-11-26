@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2-2-1 网络学 XOR · 作业 01</title>
+<meta name="description" content="一个只有 9 个参数的两层网络如何在 300 轮里学会 XOR：逐帧回放、决策边界演化、梯度方向、隐藏层空间。所有数字由脚本从 data/metrics.json 注入。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2-2-1 网络学 XOR · 作业 01">
+<meta property="og:description" content="9 个参数、300 轮 Adam、4/4 判对。数字由脚本注入，可逐项复算。">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0D10'/%3E%3Ccircle cx='8' cy='8' r='3.5' fill='%233DDC97'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<link rel="stylesheet" href="../../assets/mlp.css">
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="topbar">
+  <div class="topbar__in">
+    <a class="brand" href="../../index.html"><span class="brand__mark"></span>HHH / 作业 01</a>
+    <nav class="nav" aria-label="站点导航">
+      <a href="../../index.html">目录</a>
+      <a href="../../assignment-01-agents/index.html">Agent 页</a>
+      <a href="../../hhh-blog/index.html">博客</a>
+        <a href="../index.html">原版</a>
+      <a href="./index.html" aria-current="page">MLP</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================= 首屏 ================= -->
+  <section class="c-hero">
+    <div class="wrap c-hero__in">
+      <p class="eyebrow"><span class="eyebrow__mark"></span>作业 01 · 神经网络</p>
+      <h1 class="title">让 2-2-1 网络<br><em>学会</em> XOR</h1>
+      <p class="hero__lead">两个输入、两个隐藏神经元、一个输出。9 个参数、300 轮全批量 Adam，把四个点判成 0,1,1,0。这一页把训练过程一帧一帧放出来：第 {{K:epochs}} 轮结束时损失 {{K:loss_init}} 落到 {{K:loss_end}}。</p>
+
+      <div class="verdict" role="group" aria-label="结论">
+        <div><b>{{K:acc}}<span class="u">/4</span></b><span>训练集判对</span></div>
+        <div><b>{{K:loss_end}}</b><span>末轮交叉熵（初值 {{K:loss_init}}）</span></div>
+        <div><b>{{K:params}}</b><span>个参数，全部可点</span></div>
+        <div><b>{{K:epochs}}</b><span>轮，每轮 1 次更新</span></div>
+      </div>
+
+      <div class="hero-actions js-only">
+        <button class="btn" type="button" data-act="replay">从头回放</button>
+        <a class="btn btn--quiet" href="#play">看训练台</a>
+        <a class="btn btn--quiet" href="#numbers">直接看数字</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 01 任务 ================= -->
+  <section class="section" id="why">
+    <div class="wrap">
+      <div class="rail"><span class="rail__no">01 / 07</span><span class="rail__line"></span><span class="rail__label">为什么需要隐藏层</span></div>
+
+      <div class="task">
+        <div class="task__fig reveal">
+          <svg viewBox="0 0 360 300" role="img" aria-label="XOR 的四个点在平面上呈对角两类：左下与右上为同一类">
+            <rect x="40" y="20" width="280" height="240" fill="none" stroke="#2A2E35" stroke-width="1"/>
+            <g stroke="#2A2E35" stroke-width="1">
+              <line x1="110" y1="20" x2="110" y2="260"/><line x1="180" y1="20" x2="180" y2="260"/><line x1="250" y1="20" x2="250" y2="260"/>
+              <line x1="40" y1="80" x2="320" y2="80"/><line x1="40" y1="140" x2="320" y2="140"/><line x1="40" y1="200" x2="320" y2="200"/>
+            </g>
+            <!-- 两类点：空心 = 0，实心 = 1 -->
+            <circle cx="40" cy="260" r="8" fill="none" stroke="#9AA0A6" stroke-width="1.5"/>
+            <circle cx="320" cy="20" r="8" fill="#3DDC97"/>
+            <circle cx="40" cy="20" r="8" fill="#3DDC97"/>
+            <circle cx="320" cy="260" r="8" fill="none" stroke="#9AA0A6" stroke-width="1.5"/>
+            <g fill="#9AA0A6" font-family="ui-monospace, monospace" font-size="10">
+              <text x="52" y="274">(0,0) → 0</text>
+              <text x="308" y="274" text-anchor="end">(1,0) → 1</text>
+              <text x="52" y="12">(0,1) → 1</text>
+              <text x="308" y="12" text-anchor="end">(1,1) → 0</text>
+            </g>
+            <g stroke="#3DDC97" stroke-width="1" stroke-dasharray="3 4" opacity=".55">
+              <line x1="34" y1="254" x2="326" y2="26"/>
+            </g>
+          </svg>
+          <p class="task__cap">两条对角线各是一类。任何一条直线最多分对三个点——这是单层网络学不会 XOR 的原因，不是训练不够久。</p>
+        </div>
+
+        <div class="prose reveal">
+          <h2>一条直线分不开，两条就够了</h2>
+          <p>四个点放在正方形的四角，两类各占一条对角线。单层感知机的边界是一条直线，无论怎么摆都会分错一个点。想让错误降到 0，必须先把输入映射到另一个空间，再在那个空间里画线。</p>
+          <p>这里用最小的方案：<strong>两个隐藏神经元</strong>。每个隐藏单元各自画一条线，输入落到线的哪一侧，就决定它在这一维的坐标；两个坐标拼起来，原来分不开的对角线变成了可以一刀切开的形状。</p>
+          <p>参数量：输入到隐藏 2×2 的权重加 2 个偏置，隐藏到输出 2 个权重加 1 个偏置，合计 <span class="mono">{{K:params}}</span> 个数。整页所有读数都是这 9 个数算出来的。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 结构与参数 ================= -->
+  <section class="section" id="net">
+    <div class="wrap">
+      <div class="rail"><span class="rail__no">02 / 07</span><span class="rail__line"></span><span class="rail__label">结构 · 参数</span></div>
+
+      <div class="fig-solo">
+        <figure class="reveal" style="margin:0;">
+          <img src="figures/fig_net.svg" alt="2-2-1 网络：两个输入节点、两个隐藏神经元、一个输出节点，连线粗细表示权重绝对值，亮色为正权重、灰为负权重" style="display:block;width:100%;max-width:720px;height:auto;margin:0 auto;border:1px solid var(--line);background:var(--panel);">
+          <figcaption class="task__cap">末轮权重：亮色为正、灰色为负、线宽随绝对值。隐藏层两行权重几乎符号相反，所以两个神经元分别在两条对角线上取值。</figcaption>
+        </figure>
+      </div>
+
+      <div class="panel" style="margin-top:24px;">
+        <div class="panel__head"><span class="dot"></span>9 个参数：初值与末值</div>
+        <div class="tbl__scroll">
+          <table class="tbl tbl--params">
+            <colgroup><col style="width:14%"><col style="width:38%"><col style="width:16%"><col style="width:16%"><col style="width:16%"></colgroup>
+            <thead>
+              <tr><th scope="col">参数</th><th scope="col">含义</th><th scope="col" class="num">初值</th><th scope="col" class="num">末值</th><th scope="col" class="num">变化</th></tr>
+            </thead>
+            <tbody>
+              {{ROWS_PARAMS}}
+            </tbody>
+          </table>
+        </div>
+        <p class="panel__note">初值是手工写的常数（<span class="mono">W=[[2,-2],[-2,2]]</span>、<span class="mono">b=(-1,-1)</span>、<span class="mono">v=(3,3)</span>、<span class="mono">b_out=-2.5</span>），不是随机数——随机初值会不稳定，这件事单独在第 06 段量过。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 训练回放 ================= -->
+  <section class="section" id="play">
+    <div class="wrap">
+      <div class="rail"><span class="rail__no">03 / 07</span><span class="rail__line"></span><span class="rail__label">逐帧回放</span></div>
+      <p class="prose muted" style="margin-bottom:22px;">左边是网络本身，右边是同一时刻的决策边界。点播放，看它怎么从一片灰变成清楚的两块；拖动时间轴可以停在任意一轮。</p>
+
+      <div class="stage js-only">
+        <div class="stage__bar">
+          <button class="btn" type="button" id="btnPlay" aria-pressed="false">播放</button>
+          <button class="btn btn--quiet" type="button" id="btnPrev" aria-label="上一轮">←</button>
+          <button class="btn btn--quiet" type="button" id="btnNext" aria-label="下一轮">→</button>
+          <button class="btn btn--quiet" type="button" id="btnFirst">第 0 轮</button>
+          <button class="btn btn--quiet" type="button" id="btnLast">末轮</button>
+          <label class="mono tiny muted" for="selSpeed" style="margin-left:6px;">速度</label>
+          <select id="selSpeed" class="btn btn--quiet" style="padding:6px 8px;">
+            <option value="10">0.5×</option>
+            <option value="20" selected>1×</option>
+            <option value="40">2×</option>
+            <option value="80">4×</option>
+          </select>
+          <span class="stage__clock">第 <b id="clockEpoch">0</b> 轮 · 损失 <b id="clockLoss">—</b></span>
+        </div>
+
+        <div class="stage__body">
+          <div class="stage__cell">
+            <div class="stage__hd"><h3>网络与权重</h3><span>线宽 = |w| · 亮色为正、灰为负</span></div>
+            <canvas id="cvNet" class="cv" width="520" height="460" role="img" aria-label="2-2-1 网络结构与当前权重"></canvas>
+            <div class="legend"><span><i></i>正权重</span><span><i class="dim"></i>负权重</span><span>数值就是这一轮的参数</span></div>
+          </div>
+          <div class="stage__cell">
+            <div class="stage__hd"><h3>决策边界</h3><span id="fieldHint">p ≥ 0.5 判 1</span></div>
+            <canvas id="cvField" class="cv cv--sq" width="420" height="420" role="img" aria-label="当前决策边界与四个样本点"></canvas>
+            <div class="probs" id="probList"></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <span class="tick">0</span>
+          <input id="scrub" type="range" min="0" max="{{K:epochs}}" step="1" value="0" aria-label="训练轮次">
+          <span class="tick">{{K:epochs}}</span>
+        </div>
+
+        <dl class="readouts">
+          <div><dt>损失（交叉熵）</dt><dd id="rLoss">—</dd></div>
+          <div><dt>判对数</dt><dd id="rAcc">—</dd></div>
+          <div><dt>最小判对边界</dt><dd id="rMargin">—</dd></div>
+          <div><dt>隐藏层最大激活</dt><dd id="rHid">—</dd></div>
+        </dl>
+      </div>
+
+      <div class="nojs-only">
+        <figure style="margin:0;">
+          <img src="figures/fig_loss.svg" alt="损失曲线：从 {{K:loss_init}} 单调下降到 {{K:loss_end}}，纵轴为对数刻度" style="display:block;width:100%;height:auto;border:1px solid var(--line);background:var(--panel);">
+          <figcaption class="task__cap">训练曲线（对数纵轴）：{{K:loss_init}} → {{K:loss_end}}，{{K:epochs}} 轮。没有开启脚本时，这一页只给终态；逐帧回放需要 JavaScript。</figcaption>
+        </figure>
+        <div class="duo">
+          <figure>
+            <img src="figures/fig_boundary_init.png" alt="第 0 轮决策边界：几乎整片都判 0，只有左边缘一小块判 1" style="display:block;width:100%;height:auto;border:1px solid var(--line);">
+            <figcaption class="task__cap">第 0 轮。</figcaption>
+          </figure>
+          <figure>
+            <img src="figures/fig_boundary_final.png" alt="末轮决策边界：右上与左下为判 1 的区域，四个样本全部判对" style="display:block;width:100%;height:auto;border:1px solid var(--line);">
+            <figcaption class="task__cap">末轮。</figcaption>
+          </figure>
+        </div>
+        <p class="task__cap">同一张画布上的判 1 区域：第 0 轮只有左边缘一条窄带（几乎整片判 0），末轮变成上下两块，四个样本 {{K:acc}} 判对。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 04 隐藏层空间 ================= -->
+  <section class="section" id="hidden">
+    <div class="wrap">
+      <div class="rail"><span class="rail__no">04 / 07</span><span class="rail__line"></span><span class="rail__label">隐藏层做了什么</span></div>
+
+      <div class="task task--fig">
+        <figure class="js-only" style="margin:0;">
+          <canvas id="cvHidden" class="cv cv--sq" width="380" height="380" role="img" aria-label="四个样本在隐藏层两维空间中的位置"></canvas>
+          <figcaption class="task__cap">横轴 h₁、纵轴 h₂。每个点都在当前轮的位置上；训练早期四个点挤在中间，后期分成两簇——(0,0) 与 (1,1) 本来就是同一类，末轮几乎落在同一点上。</figcaption>
+        </figure>
+        <div class="prose">
+          <h2>两个隐藏单元各自画了一条线</h2>
+          <p>把输入 (x₁, x₂) 送进隐藏层，得到两个数 (h₁, h₂)。这两个数就是新的坐标：原来在正方形四角的四个点，被搬到 (h₁, h₂) 平面上。搬完之后，原来分不开的对角两类，变成两个可以分开的簇。</p>
+          <p>末轮四个样本的激活值：</p>
+          <div class="tbl__scroll" style="margin:14px 0 18px;">
+            <table class="tbl">
+              <thead><tr><th scope="col">样本</th><th scope="col" class="num">h₁</th><th scope="col" class="num">h₂</th><th scope="col" class="num">输出概率</th><th scope="col">判定</th></tr></thead>
+              <tbody>{{ROWS_SAMPLES}}</tbody>
+            </table>
+          </div>
+          <p class="muted">两个隐藏单元的取值几乎互为镜像：一个在 (0,0)、(1,1) 处接近 0，另一个在 (0,1)、(1,0) 处接近 0。所以输出层只要把两列加起来就能分开——这也是为什么 2 个隐藏单元刚好够。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 05 梯度 ================= -->
+  <section class="section" id="grad">
+    <div class="wrap">
+      <div class="rail"><span class="rail__no">05 / 07</span><span class="rail__line"></span><span class="rail__label">梯度在指哪</span></div>
+
+      <div class="prose" style="margin-bottom:18px;">
+        <p>每一帧都记录了优化器更新前的 9 个梯度。它们不是用前后两帧参数差反推的，是训练脚本当场写下来的——所以「箭头指向损失下降方向」这句话在这一页是可验证的，不是修辞。</p>
+      </div>
+
+      <div class="panel js-only">
+        <div class="panel__head"><span class="dot"></span>第 <span id="gradEpoch" class="mono">0</span> 轮的梯度 <span class="muted tiny" style="font-weight:400;letter-spacing:0;">（条长按当轮最大绝对值归一）</span></div>
+        <div class="params" id="gradRows"></div>
+        <p class="panel__note">亮色表示梯度为正（参数该变小），灰色表示梯度为负（参数该变大）。Adam 用的不只是这一步的方向，还有它的一阶矩和二阶矩，所以实际的步长和这里的条长不成正比。</p>
+      </div>
+
+      <div class="nojs-only panel">
+        <div class="panel__head"><span class="dot"></span>第 0 轮的梯度（静态）</div>
+        <div class="tbl__scroll">
+          <table class="tbl">
+            <thead><tr><th scope="col">参数</th><th scope="col" class="num">梯度</th><th scope="col">方向</th></tr></thead>
+            <tbody>{{ROWS_GRAD}}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 06 关键数字 ================= -->
+  <section class="section" id="numbers">
+    <div class="wrap">
+      <div class="rail"><span class="rail__no">06 / 07</span><span class="rail__line"></span><span class="rail__label">关键数字</span></div>
+
+      <div class="panel">
+        <div class="tbl__scroll">
+          <table class="tbl tbl--wide">
+            <colgroup><col style="width:30%"><col style="width:17%"><col style="width:17%"><col style="width:36%"></colgroup>
+            <thead><tr><th scope="col">指标</th><th scope="col" class="num">初值</th><th scope="col" class="num">末值</th><th scope="col">说明</th></tr></thead>
+            <tbody>{{ROWS_KEY}}</tbody>
+          </table>
+        </div>
+        <p class="panel__note">这四行是这一页的全部结论性数字，每一个都能用仓库里的 <span class="mono">code/run_and_log.py</span> 复算出来。</p>
+      </div>
+
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel__head"><span class="dot"></span>随机初值：同样的代码不一定学会</div>
+        <div class="panel__body">
+          <p class="prose" style="margin:0 0 14px;">把初值换成随机数（W、v ~ N(0,2)，b、b₀ ~ N(0,1)），其余设置不变，跑 20 个种子：<strong class="signal">{{K:rand_ok}} 次学会、{{K:rand_fail}} 次没学会</strong>。没学会的那几次，损失停在 0.69 附近——正好是「四个样本全判 0.5」时的交叉熵。</p>
+          <p class="prose muted" style="margin:0;">这不是代码 bug，是 2 个隐藏单元的自由度太小：初值把两个隐藏单元放在同一条线上，它们就永远分不出两条线来。固定初值就是为了让这件作业每次讲同一件事。</p>
+          <p class="tiny muted" style="margin:12px 0 0;">失败的种子：<span class="mono">{{K:rand_bad}}</span>。脚本在 <span class="mono">code/random_init.py</span>。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 07 复现 ================= -->
+  <section class="section" id="repro">
+    <div class="wrap">
+      <div class="rail"><span class="rail__no">07 / 07</span><span class="rail__line"></span><span class="rail__label">复现 · 降级</span></div>
+
+      <div class="task task--even">
+        <div>
+          <h2 class="lead" style="font-size:20px;">复现：一条命令</h2>
+          <div class="cmd">python code/run_and_log.py
+python code/build_page.py
+python code/verify.py</div>
+          <p class="notice tiny muted" style="margin-top:12px;line-height:1.7;">第二条命令把 <span class="mono">data/metrics.json</span> 里的数字写进这一页，第三条把能查的都查一遍：帧数、每帧 32 个数、参数重算、连续两次构建是否逐字节一致、页面里有没有外部请求。</p>
+        </div>
+        <div>
+          <h2 class="lead" style="font-size:20px;">关掉 JavaScript 之后</h2>
+          <p class="prose" style="margin:0 0 10px;">回放台、隐藏层散点、梯度条会消失，其余部分照常可读：结论带、9 个参数的初末值表、末轮决策边界图、损失曲线、四个样本的激活与判定、关键数字表。</p>
+          <p class="prose muted" style="margin:0;">降级不是「留一块空白」，而是提前把终态画成静态图放进页面——脚本关掉时看到的是同一组数字，只是不能拖着看中间过程。</p>
+        </div>
+      </div>
+
+      <p class="tiny muted" style="margin-top:26px;">数据指纹：<span class="mono">{{K:build}}</span> · 帧数 {{K:frames}} · 每帧 32 个数 · {{K:dtype}} · 生成脚本 <span class="mono">code/run_and_log.py</span></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <span>作业 01 · 2-2-1 网络学 XOR · <span class="mono">2026-11-26</span></span>
+    <span class="mono tiny">HHH / 02</span>
+  </div>
+</footer>
+
+<script type="application/json" id="xor-data">{{DATA}}</script>
+<script src="../../assets/site.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

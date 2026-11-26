@@ -59,8 +59,47 @@
     <div class="meta">损失 0.5620 → 0.0279 · 四样本全对 0,1,1,0 · 随机初值 9/20</div>
   </a>
 
-  <h2>待补</h2>
-  <div class="empty">下一次作业会作为 <code>assignment-02-…</code> 加在这里，页面顶部再挂一张卡片。</div>
+  <a class="card" href="assignment-01-xor-mlp/v2/">
+    <div class="row">
+      <span class="no done">作业 01</span>
+      <span class="ttl">同一份训练记录 · 互动升级版</span>
+    </div>
+    <div class="desc">
+      不改原数据：<code>data/metrics.json</code> 仍是原来那份逐轮记录，这一版只是把它多记了两种东西——每轮的
+      9 个梯度、两个隐藏单元的激活，然后重做成一台可以逐帧重放的台子。关掉 JavaScript 也能读到末态的四张静态图。
+      原版保留在 <code>assignment-01-xor-mlp/</code>，两页顶部互链。
+    </div>
+    <div class="meta">301 帧 · 9 参数 · 23 项自检 · 两次构建逐字节一致</div>
+  </a>
+
+  <h2>附加</h2>
+
+  <a class="card" href="assignment-01-agents/">
+    <div class="row">
+      <span class="no">附加 A</span>
+      <span class="ttl">五款 Agent 的用法与证据</span>
+    </div>
+    <div class="desc">
+      把 DeepSeek Harness、WorkBuddy、Codex 各自负责的一段活写清楚，另外两款（Trae、Claude）只写定位与「为什么不是主力」。
+      没有评分、没有排名，事实矩阵 30 格里只有 8 格能核实，其余标「待核」。
+    </div>
+    <div class="meta">5 款工具 · 3 张截图 · 7 段 · 与参考站的 7 条差异</div>
+  </a>
+
+  <a class="card" href="hhh-blog/">
+    <div class="row">
+      <span class="no">附加 B</span>
+      <span class="ttl">技术博客 · 三篇构建记录</span>
+    </div>
+    <div class="desc">
+      Markdown 写，脚本渲染成静态 HTML，页面上的数字全部由构建脚本从数据文件注入。
+      三篇分别讲：无头截图的四个坑、XOR 九参数三百轮、页面里的数字为什么一个都不许手写。
+    </div>
+    <div class="meta">3 篇 · feed.xml · 零外部请求</div>
+  </a>
+
+  <h2>说明</h2>
+  <div class="empty">所有页面的数字都能用仓库里的脚本重算；缺素材的地方写「待核」，不放占位图。验收记录见 <a href="AUDIT.md">AUDIT.md</a>。</div>
 
   <footer>
     仓库：<a href="https://github.com/hhfree1/hhh-ai-homework">github.com/hhfree1/hhh-ai-homework</a> ·
