@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>HHH · 技术博客</title>
     <link>https://hhfree1.github.io/hhh-ai-homework/hhh-blog/</link>
     <description>三篇第一手记录：把数字交给构建脚本、2-2-1 网络学 XOR、无头截图的四个坑。</description>
     <language>zh-CN</language>
+    <managingEditor>hhfree1</managingEditor>
     <lastBuildDate>Thu, 26 Nov 2026 00:00:00 +0800</lastBuildDate>
     <atom:link href="https://hhfree1.github.io/hhh-ai-homework/hhh-blog/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
@@ -12,6 +13,7 @@
       <link>https://hhfree1.github.io/hhh-ai-homework/hhh-blog/post/headless-screenshot.html</link>
       <guid isPermaLink="true">https://hhfree1.github.io/hhh-ai-homework/hhh-blog/post/headless-screenshot.html</guid>
       <pubDate>Thu, 26 Nov 2026 00:00:00 +0800</pubDate>
+      <dc:creator>hhfree1</dc:creator>
       <description>命名管道、后台任务被清扫、离屏图片不栅格化、入场动画没触发——四种「页面看起来坏了」的假象，以及一个先诊断再改的顺序。</description>
     </item>
     <item>
@@ -19,6 +21,7 @@
       <link>https://hhfree1.github.io/hhh-ai-homework/hhh-blog/post/xor-mlp.html</link>
       <guid isPermaLink="true">https://hhfree1.github.io/hhh-ai-homework/hhh-blog/post/xor-mlp.html</guid>
       <pubDate>Wed, 25 Nov 2026 00:00:00 +0800</pubDate>
+      <dc:creator>hhfree1</dc:creator>
       <description>两条直线就够了。九个参数逐帧记下来，20 次随机初值里失败的 11 次，还有一次把梯度写错、收敛得很漂亮却对不上记录的经历。</description>
     </item>
     <item>
@@ -26,6 +29,7 @@
       <link>https://hhfree1.github.io/hhh-ai-homework/hhh-blog/post/numbers-not-typed.html</link>
       <guid isPermaLink="true">https://hhfree1.github.io/hhh-ai-homework/hhh-blog/post/numbers-not-typed.html</guid>
       <pubDate>Tue, 24 Nov 2026 00:00:00 +0800</pubDate>
+      <dc:creator>hhfree1</dc:creator>
       <description>301 帧、9632 个数、23 项检查：把静态页面上的每个数字交给构建脚本，代价和收益分别是什么。</description>
     </item>
   </channel>

@@ -150,13 +150,14 @@ def build() -> None:
 
     count = len(posts)
     updated = posts[0]["date"]
+    author = site.get("author", "hhfree1")
 
     head_tpl = (TPL / "head.html").read_text(encoding="utf-8")
     foot_tpl = (TPL / "foot.html").read_text(encoding="utf-8")
 
     def page(title: str, desc: str, root: str, body: str) -> str:
         head = fill(head_tpl, {"TITLE": title, "DESC": desc, "ROOT": root})
-        foot = fill(foot_tpl, {"ROOT": root, "COUNT": str(count), "UPDATED": updated})
+        foot = fill(foot_tpl, {"ROOT": root, "COUNT": str(count), "UPDATED": updated, "AUTHOR": author})
         return head + body + foot
 
     # ---- 首页
@@ -223,7 +224,7 @@ def build() -> None:
     # ---- 关于 / 取舍
     for name, title in (("about", "关于"), ("differences", "取舍")):
         body = fill((TPL / f"{name}.html").read_text(encoding="utf-8"), {
-            "ROOT": "", "COUNT": str(count), "UPDATED": updated,
+            "ROOT": "", "COUNT": str(count), "UPDATED": updated, "AUTHOR": author,
         })
         (ROOT / f"{name}.html").write_text(
             page(f"{title} · {site['title']}", site["desc"], "", body), encoding="utf-8")
@@ -238,17 +239,20 @@ def build() -> None:
             f"      <link>{link}</link>\n"
             f'      <guid isPermaLink="true">{link}</guid>\n'
             f"      <pubDate>{date_rfc822(p['date'])}</pubDate>\n"
+            f"      <dc:creator>{html.escape(author)}</dc:creator>\n"
             f"      <description>{html.escape(p['summary'])}</description>\n"
             "    </item>"
         )
     feed = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"'
+        ' xmlns:dc="http://purl.org/dc/elements/1.1/">\n'
         "  <channel>\n"
         f"    <title>{html.escape(site['title'])}</title>\n"
         f"    <link>{BASE_URL}</link>\n"
         f"    <description>{html.escape(site['desc'])}</description>\n"
         "    <language>zh-CN</language>\n"
+        f"    <managingEditor>{html.escape(author)}</managingEditor>\n"
         f"    <lastBuildDate>{date_rfc822(updated)}</lastBuildDate>\n"
         f'    <atom:link href="{BASE_URL}feed.xml" rel="self" type="application/rss+xml"/>\n'
         + "\n".join(items) + "\n"

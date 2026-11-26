@@ -274,6 +274,8 @@
 
 .about-grid dd { margin: 0 0 22px; font-size: var(--fs-14); line-height: 1.7; }
 
+.about-grid__h { margin: 0 0 18px; }
+
 .diff { margin: 0; padding: 0; list-style: none; counter-reset: d; max-width: var(--prose); }
 
 .diff li {
