@@ -1,111 +1,15 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>人工智能通识 · 课程作业</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f2e9"><meta name="description" content="课程作业目录：Agent 的使用与感受，以及 MLP 的可视化实现。">
+<title>作业手记｜课程作业目录</title>
 <style>
-  :root { --ink:#2C2C2A; --muted:#5F5E5A; --line:#E3E1DA; --bg:#FBFAF7; --blue:#185FA5; --orange:#BA7517; }
-  * { box-sizing:border-box; }
-  body {
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
-    font-size:15px; line-height:1.75;
-  }
-  .wrap { max-width:820px; margin:0 auto; padding:56px 22px 80px; }
-  .kicker { font-size:12.5px; color:var(--muted); letter-spacing:.04em; }
-  h1 { font-size:27px; font-weight:600; margin:10px 0 12px; }
-  .sub { color:var(--muted); font-size:14px; border-bottom:1px solid var(--line); padding-bottom:24px; }
-  h2 { font-size:15px; font-weight:600; color:var(--muted); margin:36px 0 14px; letter-spacing:.02em; }
-  a.card {
-    display:block; background:#fff; border:1px solid var(--line); border-radius:12px;
-    padding:22px 24px; margin-bottom:14px; text-decoration:none; color:inherit;
-    transition:border-color .15s, transform .15s;
-  }
-  a.card:hover { border-color:#B4B2A9; transform:translateY(-1px); }
-  .row { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
-  .no { font-size:12.5px; color:#fff; background:var(--blue); border-radius:999px; padding:2px 10px; }
-  .no.done { background:var(--orange); }
-  .ttl { font-size:17px; font-weight:600; }
-  .desc { color:var(--muted); font-size:13.5px; margin-top:8px; }
-  .meta { font-size:12.5px; color:#888780; margin-top:10px; font-variant-numeric:tabular-nums; }
-  .empty { border:1px dashed var(--line); border-radius:12px; padding:22px 24px; color:#888780; font-size:13.5px; }
-  footer { border-top:1px solid var(--line); margin-top:40px; padding-top:16px; font-size:12.5px; color:var(--muted); }
-  a { color:var(--blue); }
-</style>
-</head>
-<body>
-<div class="wrap">
-
-  <div class="kicker">苏州大学 · 人工智能通识</div>
-  <h1>课程作业合集</h1>
-  <div class="sub">
-    每次作业一个独立文件夹，各自的代码、数据、图表和在线页面都放在里面，互不影响。
-    所有结果均由脚本实际运行产生，点进去可以逐项核对。
-  </div>
-
-  <h2>已完成</h2>
-
-  <a class="card" href="assignment-01-xor-mlp/">
-    <div class="row">
-      <span class="no done">作业 01</span>
-      <span class="ttl">MLP 学习参数的实现与可视化</span>
-    </div>
-    <div class="desc">
-      第二篇 15 节「人工神经元网络」，对应讲义第 66 页「多层网络怎样学习参数？Python 实现与反向传播」。
-      跑通官方 PyTorch 脚本，记录 300 轮训练的每一轮参数，做成可拖动的动态演示：
-      左边看判定区域怎么长出来，右边看四个点怎么被搬进新的坐标。另附随机初值重复 20 次的对照实验。
-    </div>
-    <div class="meta">损失 0.5620 → 0.0279 · 四样本全对 0,1,1,0 · 随机初值 9/20</div>
-  </a>
-
-  <a class="card" href="assignment-01-xor-mlp/v2/">
-    <div class="row">
-      <span class="no done">作业 01</span>
-      <span class="ttl">同一份训练记录 · 互动升级版</span>
-    </div>
-    <div class="desc">
-      不改原数据：<code>data/metrics.json</code> 仍是原来那份逐轮记录，这一版只是把它多记了两种东西——每轮的
-      9 个梯度、两个隐藏单元的激活，然后重做成一台可以逐帧重放的台子。关掉 JavaScript 也能读到末态的四张静态图。
-      原版保留在 <code>assignment-01-xor-mlp/</code>，两页顶部互链。
-    </div>
-    <div class="meta">301 帧 · 9 参数 · 23 项自检 · 两次构建逐字节一致</div>
-  </a>
-
-  <h2>附加</h2>
-
-  <a class="card" href="assignment-01-agents/">
-    <div class="row">
-      <span class="no">附加 A</span>
-      <span class="ttl">五款 Agent 的用法与证据</span>
-    </div>
-    <div class="desc">
-      把 DeepSeek Harness、WorkBuddy、Codex 各自负责的一段活写清楚，另外两款（Trae、Claude）只写定位与「为什么不是主力」。
-      没有评分、没有排名，事实矩阵 30 格里只有 8 格能核实，其余标「待核」。
-    </div>
-    <div class="meta">5 款工具 · 3 张截图 · 7 段 · 与参考站的 7 条差异</div>
-  </a>
-
-  <a class="card" href="hhh-blog/">
-    <div class="row">
-      <span class="no">附加 B</span>
-      <span class="ttl">技术博客 · 三篇构建记录</span>
-    </div>
-    <div class="desc">
-      Markdown 写，脚本渲染成静态 HTML，页面上的数字全部由构建脚本从数据文件注入。
-      三篇分别讲：无头截图的四个坑、XOR 九参数三百轮、页面里的数字为什么一个都不许手写。
-    </div>
-    <div class="meta">3 篇 · feed.xml · 零外部请求</div>
-  </a>
-
-  <h2>说明</h2>
-  <div class="empty">所有页面的数字都能用仓库里的脚本重算；缺素材的地方写「待核」，不放占位图。验收记录见 <a href="AUDIT.md">AUDIT.md</a>。</div>
-
-  <footer>
-    仓库：<a href="https://github.com/hhfree1/hhh-ai-homework">github.com/hhfree1/hhh-ai-homework</a> ·
-    课程页面：<a href="https://zhumy.github.io/Introduction_to_Artificial_Intelligence/">zhumy.github.io/Introduction_to_Artificial_Intelligence</a>
-  </footer>
-
-</div>
-</body>
-</html>
+:root{--paper:#f7f2e9;--card:#fffdf8;--ink:#342f2a;--muted:#766d63;--line:#e8ded0;--clay:#b85f3c;--sage:#78856b;--sun:#e2bc78;--shadow:0 18px 50px #6e51321a;--ease:cubic-bezier(.2,.7,.25,1)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}.shell{width:min(1080px,calc(100% - 48px));margin:auto}.top{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}.brand{font-weight:700;color:var(--ink);letter-spacing:.05em}.top-note{font-size:12px}.hero{padding:clamp(72px,12vw,150px) 0 92px;position:relative}.eyebrow{color:var(--clay);font-size:12px;letter-spacing:.16em;text-transform:uppercase}.hero h1{font-size:clamp(42px,8vw,88px);letter-spacing:-.055em;line-height:1.07;font-weight:650;margin:18px 0 22px;max-width:850px}.hero h1 em{font-family:Georgia,serif;font-weight:500;color:var(--clay)}.intro{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:590px}.hero-mark{position:absolute;right:4%;top:24%;width:clamp(100px,17vw,190px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 35%,#f9e5bd 0 19%,#e8c98d 20% 21%,transparent 22%),linear-gradient(145deg,#d78d62,#b85f3c);opacity:.82;filter:saturate(.8);z-index:-1}.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:22px}.section-head h2{font-size:14px;letter-spacing:.12em;color:var(--muted);font-weight:600}.section-head span{font-family:Georgia,serif;color:#a99b88;font-size:14px}.works{display:grid;grid-template-columns:1fr 1fr;gap:18px}.work{position:relative;display:flex;min-height:310px;flex-direction:column;justify-content:space-between;padding:30px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:inherit;text-decoration:none;box-shadow:0 0 0 transparent;transition:transform .45s var(--ease),box-shadow .45s var(--ease),border-color .45s var(--ease);overflow:hidden}.work:hover,.work:focus-visible{transform:translateY(-5px);box-shadow:var(--shadow);border-color:#d2b89e}.work:focus-visible{outline:3px solid #b85f3c66;outline-offset:3px}.work-top{display:flex;align-items:center;justify-content:space-between}.number{font:12px Georgia,serif;color:var(--clay);letter-spacing:.08em}.arrow{font-size:22px;color:#9b8b78;transition:transform .35s var(--ease)}.work:hover .arrow{transform:translate(4px,-4px)}.work h3{font-size:clamp(23px,3vw,34px);line-height:1.3;letter-spacing:-.025em;margin:34px 0 10px}.work p{color:var(--muted);max-width:38ch;margin:0}.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.tag{font-size:11px;color:#72675c;background:#f3ece1;padding:4px 10px;border-radius:999px}.work--agent:after,.work--mlp:after{content:"";position:absolute;width:200px;height:200px;border-radius:50%;right:-86px;bottom:-110px;background:#e9c78f44;transition:transform .6s var(--ease)}.work--mlp:after{background:#aeb99c44}.work:hover:after{transform:scale(1.4)}.closing{display:flex;justify-content:space-between;gap:24px;align-items:center;margin:76px 0 26px;padding:24px 0;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.closing strong{color:var(--ink);font-weight:550}.footer{padding:20px 0 46px;color:#9b8f81;font-size:11px}.enter{opacity:0;transform:translateY(16px);animation:enter .8s var(--ease) forwards}.enter:nth-child(2){animation-delay:.12s}.enter:nth-child(3){animation-delay:.22s}@keyframes enter{to{opacity:1;transform:none}}@media(max-width:700px){.shell{width:min(100% - 32px,560px)}.top{height:60px}.top-note{max-width:150px;text-align:right}.hero{padding:78px 0 64px}.hero-mark{right:0;top:18%;opacity:.5}.works{grid-template-columns:1fr}.work{min-height:260px;padding:24px}.closing{align-items:flex-start;flex-direction:column;margin-top:54px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.enter{opacity:1;transform:none}}
+</style></head>
+<body><header class="top shell"><div class="brand">作业手记 <span style="color:#b9aa96;font-weight:400">/ COURSE NOTES</span></div><div class="top-note">人工智能通识 · 我的作业目录</div></header>
+<main class="shell"><section class="hero enter"><div class="hero-mark" aria-hidden="true"></div><div class="eyebrow">A personal coursework index</div><h1>把每次作业，<br><em>认真留下来。</em></h1><p class="intro">这里收录我的课程作业与实践记录。选择一项，继续看看我如何尝试、实现和理解它。</p></section>
+<section aria-labelledby="work-heading"><div class="section-head"><h2 id="work-heading">课程作业 · COURSEWORK</h2><span>02 pieces</span></div><div class="works">
+<a class="work work--agent enter" href="assignment-01-agents/"><div class="work-top"><span class="number">NO. 01</span><span class="arrow" aria-hidden="true">↗</span></div><div><h3>Agent 的使用<br>与感受</h3><p>记录我使用不同 Agent 的过程，以及它们如何参与我的实际工作。</p><div class="tags"><span class="tag">使用记录</span><span class="tag">个人感受</span></div></div></a>
+<a class="work work--mlp enter" href="assignment-01-xor-mlp/"><div class="work-top"><span class="number">NO. 02</span><span class="arrow" aria-hidden="true">↗</span></div><div><h3>MLP 的<br>可视化实现</h3><p>通过可视化与交互，观察多层感知机学习 XOR 的过程。</p><div class="tags"><span class="tag">XOR</span><span class="tag">参数学习</span></div></div></a>
+</div></section><div class="closing"><strong>学习不是一页结论，而是一段过程。</strong><span>持续记录 · 慢慢完善</span></div></main><footer class="footer shell">苏州大学 · 人工智能通识</footer></body></html>
